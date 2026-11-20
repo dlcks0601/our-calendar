@@ -298,7 +298,7 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
                   {a.attendanceType === 'required' && (
                     <span
                       aria-hidden
-                      className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#3F5A42] text-[7px] font-black text-white ring-2 ring-white"
+                      className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#1F7A4B] text-[7px] font-black text-white ring-2 ring-white"
                     >
                       ✓
                     </span>
