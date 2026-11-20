@@ -1,15 +1,18 @@
 @import 'tailwindcss';
 
 /* our calendar — 바탕은 검정과 흰색이다. 버튼·선택·글자는 무채색으로 두고,
-   색은 정보를 구분할 때만 쓴다(일정 종류, 사람, 경고, 새 알림). 파란 계열은 쓰지 않는다.
-   글자는 가볍게 두고(굵기 300~560), 무게는 순수한 검정 면이 진다. */
+   색은 정보를 구분할 때만 쓴다(일정 종류, 사람, 경고, 새 알림).
+   토큰 값은 여기 적지 않는다. 명세(src/shared/tokens/spec)에서 생성한 테마를 가져온다. */
+@import '../../shared/tokens/__generated__/theme.css';
+
+/* 임시 별칭 — 화면이 아직 옛 클래스 이름을 쓴다. 화면을 새 토큰으로 옮긴 뒤 지운다. */
 @theme {
   --color-primary: #000000;
   --color-primary-pressed: #2e2e2e;
   --color-primary-tint: #e6e6e6;
   --color-bg: #ffffff;
   --color-section: #f4f4f4;
-  --color-border: #e3e3e3;
+  --color-border: #e6e6e6;
   --color-text-strong: #000000;
   --color-text-body: #4a4a4a;
   --color-text-weak: #8c8c8c;
@@ -17,30 +20,8 @@
   --color-error: #e5342b;
   --color-warn-fg: #8a6410;
   --color-warn-bg: #fcf1d6;
-  /* 새 알림이 도착했다는 신호. */
   --color-alert: #f03e3e;
   --radius-card: 16px;
-
-  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  /* 로고 전용 — Overused Grotesk(--font-wordmark, RootLayout에서 주입) */
-  --font-logo: var(--font-wordmark), 'Pretendard Variable', Pretendard, sans-serif;
-
-  /* 굵기 단계를 통째로 한 칸씩 가볍게 — 위계는 유지하고 전체 인상만 덜어 낸다. */
-  --font-weight-light: 300;
-  --font-weight-normal: 380;
-  --font-weight-medium: 440;
-  --font-weight-semibold: 500;
-  --font-weight-bold: 560;
-  --font-weight-extrabold: 600;
-  --font-weight-black: 620;
-}
-
-:root {
-  --bezier-standard: cubic-bezier(0.4, 0, 0.2, 1);
-  --bezier-out: cubic-bezier(0.25, 0.1, 0.25, 1);
-  --bezier-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --bezier-back: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --bezier-ambient: cubic-bezier(0.6, 0, 0, 0.6);
 }
 
 body {
