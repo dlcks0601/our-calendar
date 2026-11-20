@@ -10,6 +10,8 @@ import { ROOMS, type Room } from '@/entities/room';
 import { fmtDayKorean, fmtRange } from '@/shared/lib/time';
 import type { Attendee } from '@/entities/member';
 import type { CandidateSlot } from '@/entities/slot';
+import { SPRING } from '@/shared/tokens';
+import { ActionButton } from '@/shared/ui/action-button';
 
 /**
  * 완료 — 이 제품의 유일한 감정적 순간. "시간만 잡은 게 아니라 사람을 챙겼다"를 말한다.
@@ -64,17 +66,17 @@ export function placeLabel(
 // ── 본체 ────────────────────────────────────────────────────────────
 
 /** 체크 팝 — 제자리 스프링(오버슈트가 기쁨의 목소리). */
-const POP_SPRING = { type: 'spring' as const, stiffness: 500, damping: 18 };
+const POP_SPRING = SPRING.pop;
 
 /** 축하 무대 블롭 — 스캔 모먼트와 같은 화면 전체 문법(코너 소유 + 중앙 다리, scan-drift 궤도 재사용).
  *  팔레트만 따뜻하게: 복숭아·버터가 위 코너(축하의 온도), 하늘·분홍이 아래 코너.
  *  중앙은 크림빛으로 가장 옅게 — 타이틀·버튼·카드의 가독 무대. */
 const DONE_BLOBS = [
-  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-[#FADFD5] opacity-60',
-  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-[#FAEBC8] opacity-55',
-  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#D3EAF8] opacity-50',
-  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-[#F8DDE6] opacity-50',
-  'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-[#FBF3E6] opacity-50',
+  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-coral-200 opacity-60',
+  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-yellow-200 opacity-55',
+  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-sky-200 opacity-50',
+  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-rose-200 opacity-50',
+  'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-yellow-100 opacity-50',
 ];
 
 export interface DoneStepProps {
@@ -93,7 +95,7 @@ export default function DoneStep({ state, dispatch }: DoneStepProps) {
   const items = slot ? careItems({ slot, attendees: candidates.attendees, mitigations: active }) : [];
 
   return (
-    <main className="relative min-h-dvh overflow-hidden bg-bg">
+    <main className="relative min-h-dvh overflow-hidden bg-page">
       {/* 축하 무대 — 다 잡힌 순간이니 화면 전체가 물든다(스캔 모먼트와 같은 무대, 따뜻한 팔레트). */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         {DONE_BLOBS.map((cls) => (
@@ -119,18 +121,18 @@ export default function DoneStep({ state, dispatch }: DoneStepProps) {
           initial={reduced ? false : { scale: 0 }}
           animate={{ scale: 1 }}
           transition={POP_SPRING}
-          className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-primary shadow-[0_8px_24px_rgba(0,0,0,0.21)]"
+          className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-ink shadow-s4"
         >
-          <Check size={28} strokeWidth={3} aria-hidden className="text-white" />
+          <Check size={28} strokeWidth={3} aria-hidden className="text-on-ink" />
         </motion.div>
 
         <Reveal delay={120} className="pt-5 text-center">
-          <h1 className="iridescent text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">회의가 잡혔어요</h1>
+          <h1 className="iridescent text-display font-bold leading-dense tracking-tight">회의가 잡혔어요</h1>
         </Reveal>
 
         {slot && adj && (
           <Reveal delay={190} className="pt-2 text-center">
-            <p className="text-[15px] font-medium leading-[1.5] text-text-body">
+            <p className="text-body-l font-medium leading-normal text-default">
               {fmtDayKorean(slot.day)} {fmtRange(adj.start, adj.end)}
               {place ? ` · ${place}` : ''}
             </p>
@@ -140,8 +142,8 @@ export default function DoneStep({ state, dispatch }: DoneStepProps) {
         {/* 함께 챙긴 것 — 파생 항목이 없으면 카드도 없다 */}
         {items.length > 0 && (
           <Reveal delay={260} className="w-full pt-7">
-            <section className="rounded-card bg-white p-5 shadow-[0_2px_16px_rgba(30,30,30,0.06)] ring-1 ring-border/70">
-              <h2 className="text-[15px] font-bold tracking-[-0.01em] text-text-strong">함께 챙긴 것</h2>
+            <section className="rounded-r5 bg-page p-5 shadow-s4 ring-1 ring-default/70">
+              <h2 className="text-body-l font-bold tracking-snug text-strong">함께 챙긴 것</h2>
               <ul className="mt-3 space-y-2">
                 {items.map((text, i) => (
                   <motion.li
@@ -149,9 +151,9 @@ export default function DoneStep({ state, dispatch }: DoneStepProps) {
                     initial={reduced ? false : { opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: reduced ? 0 : 0.35 + i * 0.06, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex gap-2 text-[13px] leading-[1.55] text-text-body"
+                    className="flex gap-2 text-body-s leading-normal text-default"
                   >
-                    <span aria-hidden className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-primary/60" />
+                    <span aria-hidden className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-ink/60" />
                     <span className="break-keep">{text}</span>
                   </motion.li>
                 ))}
@@ -163,26 +165,22 @@ export default function DoneStep({ state, dispatch }: DoneStepProps) {
         {/* 버튼 위계: 주 행동은 솔리드(여정의 CTA와 같은 무게),
             보조는 회색 면(테두리 버튼은 쓰지 않는다). */}
         <Reveal delay={330} className="w-full space-y-2 pt-7">
-          <button
-            type="button"
+          <ActionButton size="lg" fullWidth
             /* 여정의 끝 — RESET으로 홈 복귀(조율 조건 초기화, myEvents 보존). 다음 '일정 만들기'가 새 출발이 된다. */
             onClick={() => dispatch({ type: 'RESET' })}
-            className="pressable h-[54px] w-full rounded-2xl bg-primary text-[16px] font-semibold text-white active:bg-primary-pressed"
           >
             내 캘린더에서 보기
-          </button>
-          <button
-            type="button"
+          </ActionButton>
+          <ActionButton variant="weak" size="lg" fullWidth
             onClick={() => dispatch({ type: 'SET_STEP', step: 'invite' })}
-            className="pressable h-[54px] w-full rounded-2xl bg-section text-[16px] font-semibold text-text-body transition-colors hover:bg-[#F1F1F1]"
           >
             참석자에게는 이렇게 보여요
-          </button>
+          </ActionButton>
         </Reveal>
 
         {/* 응답 연출은 여기 없다 — 상태 한 줄로 끝, 토스트는 홈(T19)이 재생한다 */}
         <Reveal delay={400} className="pt-5">
-          <p className="text-[12px] text-text-weak">초대를 보냈어요 · 응답이 오면 알려드릴게요</p>
+          <p className="text-label text-muted">초대를 보냈어요 · 응답이 오면 알려드릴게요</p>
         </Reveal>
         </div>
       </div>
