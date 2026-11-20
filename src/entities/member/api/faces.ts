@@ -31,12 +31,12 @@ export interface FaceConfig {
  * (Avatar 이니셜 폴백과 AvatarFace 원형 배경이 공유하는 단일 소스)
  */
 export const AVATAR_PALETTE = [
-  { bg: '#F0F0F0', text: '#000000' }, // 초록
-  { bg: '#EEEEEE', text: '#000000' }, // 보라
-  { bg: '#F0F0F0', text: '#000000' }, // 청록
-  { bg: '#F2F2F2', text: '#000000' }, // 호박
-  { bg: '#ECECEC', text: '#000000' }, // 파랑
-  { bg: '#EFEFEF', text: '#000000' }, // 분홍
+  { bg: '#E8F3EC', text: '#1B8A5A' }, // 초록
+  { bg: '#F1EBFE', text: '#7048C8' }, // 보라
+  { bg: '#F1F6D9', text: '#56700A' }, // 올리브
+  { bg: '#FFF0DC', text: '#B96A0B' }, // 호박
+  { bg: '#FBE9E4', text: '#B5482A' }, // 테라코타
+  { bg: '#FDEBF0', text: '#C0447C' }, // 분홍
 ] as const;
 
 export const FACES: Record<string, FaceConfig> = {

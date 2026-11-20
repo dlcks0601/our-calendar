@@ -88,7 +88,7 @@ function PlaceRow({
       type="button"
       aria-pressed={selected}
       onClick={onSelect}
-      className="pressable flex w-full items-center gap-3 rounded-2xl px-1 py-3 text-left transition-colors hover:bg-section/50"
+      className="pressable -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-section/60"
     >
       {remote && <Video size={18} aria-hidden className="shrink-0 text-text-weak" />}
       <span className="min-w-0 flex-1">
@@ -303,7 +303,7 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
                   {a.attendanceType === 'required' && (
                     <span
                       aria-hidden
-                      className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#000000] text-[7px] font-black text-white ring-2 ring-white"
+                      className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#12A150] text-[7px] font-black text-white ring-2 ring-white"
                     >
                       ✓
                     </span>

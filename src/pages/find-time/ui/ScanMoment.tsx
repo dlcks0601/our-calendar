@@ -33,12 +33,12 @@ export interface ScanMomentProps {
  *  각 색이 코너 하나씩을 소유하고 이음새에서만 섞인다 — 전부 겹치면 색이 죽는다(머디 워시 금지).
  *  가운데는 가장 밝게 남아 검정 헤드라인의 자리가 된다. */
 const BLOBS = [
-  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-[#D3D3D3] opacity-60',
-  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-[#CBCBCB] opacity-55',
-  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#DCDCDC] opacity-55',
-  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-[#EAEAEA] opacity-55',
+  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-[#D3A8FF] opacity-60',
+  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-[#D3C4FF] opacity-55',
+  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#FFD1DF] opacity-55',
+  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-[#FFE9B5] opacity-55',
   // 가운데 — 코너 색들의 다리(연한 페리윙클). 헤드라인 가독을 지키는 가장 옅은 톤.
-  'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-[#DFDFDF] opacity-45',
+  'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-[#E7CFFF] opacity-45',
 ];
 
 export default function ScanMoment({ attendees, duration, onDone }: ScanMomentProps) {
@@ -132,7 +132,7 @@ export default function ScanMoment({ attendees, duration, onDone }: ScanMomentPr
                           className="scan-halo absolute -inset-[7px] rounded-full"
                           style={{
                             background:
-                              'radial-gradient(circle, rgba(0,0,0,.28), rgba(0,0,0,.10) 55%, transparent 72%)',
+                              'radial-gradient(circle, rgba(0,0,0,0.17), rgba(0,0,0,0.06) 55%, transparent 72%)',
                           }}
                         />
                         <span className="absolute inset-[6px] rounded-full bg-primary" />
@@ -149,7 +149,7 @@ export default function ScanMoment({ attendees, duration, onDone }: ScanMomentPr
                       <div className="relative my-[5px] min-h-[18px] w-[3px] flex-1 overflow-hidden rounded-full bg-section">
                         <span
                           aria-hidden
-                          className="absolute inset-0 origin-top rounded-full bg-gradient-to-b from-[#000000] to-[#CBCBCB]"
+                          className="absolute inset-0 origin-top rounded-full bg-gradient-to-b from-[#A145FC] to-[#D7AEFF]"
                           style={{
                             transform: 'scaleY(0)',
                             animation:
@@ -181,7 +181,7 @@ export default function ScanMoment({ attendees, duration, onDone }: ScanMomentPr
                     </p>
                     {/* 설명 — 자리는 상시 확보(레일 길이 불변), 투명도로만 등장·퇴장 */}
                     <p
-                      className={`mt-[5px] text-[13px] leading-[1.5] text-[#8E8E8E] transition-opacity duration-300 ${
+                      className={`mt-[5px] text-[13px] leading-[1.5] text-[#9E72C9] transition-opacity duration-300 ${
                         active ? 'opacity-100' : 'opacity-0'
                       }`}
                     >

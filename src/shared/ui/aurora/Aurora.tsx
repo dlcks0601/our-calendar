@@ -15,10 +15,10 @@ export interface AuroraProps {
 }
 
 /** 실측 3색 — 하늘 / 복숭아 / 옅은 블루 (+scan 전용 딥 블루 계열) */
-const SKY = 'rgba(188,188,188,.25)';
-const PEACH = 'rgba(226,226,226,.2)';
-const PALE = 'rgba(225,225,225,.2)';
-const DEEP = 'rgba(61,61,61,.2)';
+const SKY = 'rgba(168,80,255,.10)';
+const PEACH = 'rgba(255,220,200,.2)';
+const PALE = 'rgba(227,200,255,.14)';
+const DEEP = 'rgba(177,120,234,.12)';
 
 interface AuroraLayer {
   /** radial-gradient 한 장 — 큰 타원 + transparent 종단으로 부드러운 falloff */
@@ -52,7 +52,7 @@ const LAYERS: Record<AuroraVariant, AuroraLayer[]> = {
     { background: glow(PEACH, 88, 66, 34, 34), opacity: 1, drift: 1 },
     { background: glow(PEACH, 70, 54, 72, 68), opacity: 0.9, drift: 4 },
     { background: glow(SKY, 60, 46, 80, 20), opacity: 0.5, drift: 2 },
-    { background: glow('rgba(250,250,250,.22)', 74, 58, 55, 78), opacity: 0.85, drift: 3 },
+    { background: glow('rgba(255,255,187,.22)', 74, 58, 55, 78), opacity: 0.85, drift: 3 },
   ],
 };
 
