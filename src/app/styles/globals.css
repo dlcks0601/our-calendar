@@ -1,0 +1,161 @@
+@import 'tailwindcss';
+
+/* our calendar — 검정과 흰색만 쓴다. 강조는 색이 아니라 잉크의 농도로 한다.
+   글자는 가볍게 두고(굵기 300~560), 무게는 순수한 검정 면이 진다. */
+@theme {
+  --color-primary: #000000;
+  --color-primary-pressed: #2e2e2e;
+  --color-primary-tint: #e6e6e6;
+  --color-bg: #ffffff;
+  --color-section: #f4f4f4;
+  --color-border: #e3e3e3;
+  --color-text-strong: #000000;
+  --color-text-body: #4a4a4a;
+  --color-text-weak: #8c8c8c;
+  --color-text-faint: #b8b8b8;
+  --color-error: #000000;
+  --color-warn-fg: #000000;
+  --color-warn-bg: #ececec;
+  --radius-card: 16px;
+
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  /* 굵기 단계를 통째로 한 칸씩 가볍게 — 위계는 유지하고 전체 인상만 덜어 낸다. */
+  --font-weight-light: 300;
+  --font-weight-normal: 380;
+  --font-weight-medium: 440;
+  --font-weight-semibold: 500;
+  --font-weight-bold: 560;
+  --font-weight-extrabold: 600;
+  --font-weight-black: 620;
+}
+
+:root {
+  --bezier-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --bezier-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --bezier-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --bezier-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --bezier-ambient: cubic-bezier(0.6, 0, 0, 0.6);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-normal);
+  font-feature-settings: 'tnum' 1;
+}
+
+/* 프레스 스쿼시 — 전 버튼·칩 공용 */
+.pressable { transition: transform 320ms var(--bezier-standard), background-color 320ms var(--bezier-standard); }
+.pressable:active { transform: scale(0.96); transition-duration: 120ms; }
+/* 포커스 — 마우스 클릭 뒤 남는 UA 기본 링 제거, 키보드 포커스만 의도된 링으로. */
+.pressable:focus { outline: none; }
+.pressable:focus-visible { outline: 2px solid rgba(0, 0, 0, 0.6); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .pressable, .pressable:active { transform: none; } }
+
+/* 스쿼클 — 연속 곡률 코너(iOS·피그마 corner smoothing 문법). 점진적 향상:
+   미지원 브라우저는 이 블록을 통째로 무시하고 일반 라운드로 본다.
+   원형이어야 하는 것들(아바타·날짜 원·점 등 rounded-full)은 진짜 원을 유지한다. */
+@supports (corner-shape: squircle) {
+  * { corner-shape: squircle; }
+  .rounded-full { corner-shape: round; }
+}
+
+/* ── 안개 — 합성 전용. radial-gradient 레이어를 transform만으로 흘려보낸다.
+   blur 필터 금지(그라데이션 falloff가 부드러움을 만든다), 리페인트 0.
+   주기는 서로소(12s/17s/23s/19s) — 패턴이 사실상 반복되지 않는다. ─────── */
+.aurora-layer { position: absolute; inset: 0; will-change: transform; }
+.aurora-l1 { animation: aurora-drift-1 12s var(--bezier-ambient) -4s infinite alternate; }
+.aurora-l2 { animation: aurora-drift-2 17s var(--bezier-ambient) -9s infinite alternate; }
+.aurora-l3 { animation: aurora-drift-3 23s var(--bezier-ambient) -15s infinite alternate; }
+.aurora-l4 { animation: aurora-drift-1 19s var(--bezier-ambient) -6s infinite alternate; }
+@keyframes aurora-drift-1 {
+  from { transform: translate3d(-7%, -5%, 0) scale(1) rotate(-2deg); }
+  to { transform: translate3d(7%, 4%, 0) scale(1.18) rotate(5deg); }
+}
+@keyframes aurora-drift-2 {
+  from { transform: translate3d(6%, 3%, 0) scale(1.12) rotate(3deg); }
+  to { transform: translate3d(-6%, -5%, 0) scale(0.94) rotate(-4deg); }
+}
+@keyframes aurora-drift-3 {
+  from { transform: translate3d(-5%, 6%, 0) scale(1.04); }
+  to { transform: translate3d(6%, -4%, 0) scale(1.2); }
+}
+
+/* ── 리빌 — blur-rise 등장. 페이드 800ms / 상승·선명 900ms, expo-out.
+   스태거는 inline animation-delay(부모가 60~80ms 간격으로 지정).
+   fill은 backwards(딜레이 동안 from 상태 유지)만 — forwards로 끝값(translateY(0)·blur(0))을
+   영구히 남기면 transform·filter가 containing block이 되어, 자손의 position:fixed
+   오버레이(알림 센터 바텀시트 등)가 뷰포트가 아니라 리빌 박스에 갇힌다.
+   끝 키프레임이 항등값이라 backwards와 both는 렌더 결과가 같다. ────────── */
+.reveal {
+  animation:
+    reveal-fade 800ms var(--bezier-expo) backwards,
+    reveal-rise 900ms var(--bezier-expo) backwards;
+}
+@keyframes reveal-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes reveal-rise {
+  from { filter: blur(12px); transform: translateY(24px); }
+  to { filter: blur(0); transform: translateY(0); }
+}
+
+/* ── 잉크 광택 — 완료 화면 타이틀 1곳만. clip-text + sheen.
+   DOM 텍스트 유지(접근성) — 검정 위로 옅은 빛이 한 번씩 지나간다. ── */
+.iridescent {
+  background-image: linear-gradient(
+    100deg,
+    #000000 0%, #000000 30%, #5c5c5c 42%, #000000 54%, #000000 100%
+  );
+  background-size: 250% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: iridescent-sheen 9s linear infinite;
+}
+@keyframes iridescent-sheen {
+  from { background-position: 0% 50%; }
+  to { background-position: -250% 50%; }
+}
+
+/* ── 스캔 모먼트 — 라이트 무대. 회색 블롭 표류(수렴 없음) + 활성 도트 헤일로 숨쉬기 +
+   타이틀 시머(왼→오, 저대비 밴드) + 레일 필 차오름. 재생 게이트는 find 화면이 소유. ── */
+.scan-blob-a { animation: scan-drift-a 8s ease-in-out infinite alternate; }
+.scan-blob-b { animation: scan-drift-b 10s ease-in-out infinite alternate; }
+.scan-blob-c { animation: scan-drift-c 9s ease-in-out infinite alternate; }
+.scan-blob-d { animation: scan-drift-d 11s ease-in-out infinite alternate; }
+.scan-blob-e { animation: scan-drift-e 12s ease-in-out infinite alternate; }
+/* 이동량은 자기 크기 기준(%) — 블롭이 뷰포트 스케일이라 px보다 %가 몸집에 맞는 보폭. */
+@keyframes scan-drift-a { to { transform: translate(18%, 14%) scale(1.18); } }
+@keyframes scan-drift-b { to { transform: translate(-16%, 15%) scale(1.1); } }
+@keyframes scan-drift-c { to { transform: translate(20%, -12%) scale(1.14); } }
+@keyframes scan-drift-d { to { transform: translate(-18%, -14%) scale(1.2); } }
+@keyframes scan-drift-e { to { transform: translate(-10%, 8%) scale(1.12); } }
+
+.scan-halo { animation: scan-breathe 2.2s ease-in-out infinite alternate; }
+@keyframes scan-breathe {
+  from { transform: scale(0.85); opacity: 0.6; }
+  to { transform: scale(1.1); opacity: 1; }
+}
+
+/* 시머 — 검정 글자 위로 회색 밴드가 지나간다. 명도 차는 두 단계로 억제. */
+.scan-title-sheen {
+  background-image: linear-gradient(90deg, #000000 25%, #3d3d3d 42%, #6e6e6e 50%, #3d3d3d 58%, #000000 75%);
+  background-size: 250% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: scan-sheen 2.4s linear infinite;
+}
+@keyframes scan-sheen {
+  from { background-position: 100% 0; }
+  to { background-position: 0% 0; }
+}
+
+@keyframes scan-fill { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-l1, .aurora-l2, .aurora-l3, .aurora-l4 { animation: none; }
+  .reveal { animation: none; }
+  .iridescent { animation: none; }
+  .scan-blob-a, .scan-blob-b, .scan-blob-c, .scan-blob-d, .scan-blob-e, .scan-halo { animation: none; }
+  .scan-title-sheen { animation: none; }
+}

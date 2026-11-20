@@ -1,0 +1,127 @@
+import { describe, expect, it } from 'vitest';
+import { buildAttendees, computeCandidates, VISIBLE_COUNT } from './useCandidates';
+import { DEFAULT_CAST, ME_ID } from '@/entities/member';
+
+/** S1 기본 6인(필수 4 + 선택 2) required 맵. */
+function defaultInput(overrides?: Partial<Parameters<typeof computeCandidates>[0]>) {
+  const required: Record<string, boolean> = {};
+  for (const id of DEFAULT_CAST.requiredIds) required[id] = true;
+  for (const id of DEFAULT_CAST.optionalIds) required[id] = false;
+  return {
+    attendeeIds: [...DEFAULT_CAST.requiredIds, ...DEFAULT_CAST.optionalIds],
+    required,
+    duration: 60 as const,
+    deadline: 'next-week' as const,
+    allowPartialRequiredId: null,
+    ...overrides,
+  };
+}
+
+describe('buildAttendees', () => {
+  it('required 맵대로 attendanceType을 매기고 주최자에 isOrganizer를 단다', () => {
+    const attendees = buildAttendees([ME_ID, 'haneul'], { [ME_ID]: true, haneul: false });
+    expect(attendees).toHaveLength(2);
+    expect(attendees[0]).toMatchObject({ id: ME_ID, attendanceType: 'required', isOrganizer: true });
+    expect(attendees[1]).toMatchObject({ id: 'haneul', attendanceType: 'optional' });
+    expect(attendees[1].isOrganizer).toBeUndefined();
+  });
+
+  it('ORG에 없는 id(딥링크 오염)는 조용히 건너뛴다', () => {
+    const attendees = buildAttendees([ME_ID, 'ghost-9'], { [ME_ID]: true, 'ghost-9': true });
+    expect(attendees.map((a) => a.id)).toEqual([ME_ID]);
+  });
+});
+
+describe('computeCandidates — S1 (기본 6인, 다음 주까지, 1시간)', () => {
+  const result = computeCandidates(defaultInput());
+
+  it('후보 9개, 표시 5개(상위 slice)', () => {
+    expect(result.slots).toHaveLength(9);
+    expect(result.visible).toHaveLength(VISIBLE_COUNT);
+    expect(result.visible.map((s) => s.id)).toEqual(result.slots.slice(0, 5).map((s) => s.id));
+  });
+
+  it('1위는 수 7/15 오전 10:00 — 하늘 앞 30분 부분 참석 포함', () => {
+    const top = result.visible[0];
+    expect(top.id).toBe('2026-07-15T600');
+    expect(top.partials).toEqual([
+      { attendeeId: 'haneul', part: 'front', minutes: 30, conflictTitle: '콘텐츠 리뷰' },
+    ]);
+  });
+
+  it('결정 모먼트는 아니다(표시 후보에 non-warning 존재) — 완화 시뮬도 돌지 않는다', () => {
+    expect(result.needsDecision).toBe(false);
+    expect(result.suggestions).toEqual([]);
+    expect(result.bottleneck).toBeNull();
+  });
+
+  it('insights는 참석자만 키로 갖는다', () => {
+    expect(Object.keys(result.insights).sort()).toEqual([...defaultInput().attendeeIds].sort());
+  });
+});
+
+describe('computeCandidates — 조건 변화', () => {
+  it('이번 주 안에 → 후보 0 → needsDecision(빈 상태/결정 모먼트 트리거)', () => {
+    const result = computeCandidates(defaultInput({ deadline: 'this-week' }));
+    expect(result.slots).toHaveLength(0);
+    expect(result.visible).toHaveLength(0);
+    expect(result.needsDecision).toBe(true);
+  });
+
+  it('S4: needsDecision이면 완화 제안(최대 3, 실측)과 병목(준호·데일리 스크럼)이 채워진다', () => {
+    const result = computeCandidates(defaultInput({ deadline: 'this-week' }));
+    expect(result.suggestions.length).toBeGreaterThanOrEqual(1);
+    expect(result.suggestions.length).toBeLessThanOrEqual(3);
+    for (const s of result.suggestions) expect(s.opens).toBeGreaterThan(0);
+    // 준호 부분 참석 허락이 선택지에 있다 — S4 데모의 핵심 경로.
+    const partial = result.suggestions.find((s) => s.kind === 'allow-partial-required');
+    expect(partial?.targetId).toBe('junho');
+    expect(result.bottleneck).toEqual({ personId: 'junho', name: '박준호', eventTitle: '데일리 스크럼' });
+  });
+
+  it('90분 → 후보 4개 전부 warning → needsDecision', () => {
+    const result = computeCandidates(defaultInput({ duration: 90 }));
+    expect(result.slots).toHaveLength(4);
+    expect(result.visible.every((s) => s.severity === 'warning')).toBe(true);
+    expect(result.needsDecision).toBe(true);
+  });
+
+  it('허락제(준호 부분 참석) — 이번 주에 슬롯이 열리고 all-required-ok 카피가 없다', () => {
+    const result = computeCandidates(
+      defaultInput({ deadline: 'this-week', allowPartialRequiredId: 'junho' }),
+    );
+    expect(result.slots.length).toBeGreaterThan(0);
+    for (const slot of result.slots) {
+      expect(slot.partials.some((p) => p.attendeeId === 'junho')).toBe(true);
+      // rankSlots가 '필수 N명 모두' 카피를 제거했다 — summaryLine 방어(ReasonCard)의 전제.
+      expect(slot.reasons.some((r) => r.code === 'all-required-ok')).toBe(false);
+    }
+  });
+});
+
+describe('computeCandidates — 참석 완전성 > 편의 보너스 (심각도 계층 정렬)', () => {
+  // 실사용 재현(2026-07-10): 준호(선택)가 온전히 참석 가능한 수 9:00(good)이,
+  // 점심 전 보너스로 점수가 부풀려진 "준호 뒤 30분만" 슬롯(tradeoff)에 밀려 있었다.
+  const compute = () =>
+    computeCandidates({
+      attendeeIds: ['ichan', 'junho', 'seoyeon'],
+      required: { ichan: true, junho: false, seoyeon: true },
+      duration: 60,
+      deadline: 'next-week',
+      allowPartialRequiredId: null,
+    });
+
+  it('good 슬롯이 고점수 tradeoff보다 항상 먼저다', () => {
+    const { slots } = compute();
+    const firstTradeoff = slots.findIndex((s) => s.severity === 'tradeoff');
+    const lastGood = slots.map((s) => s.severity).lastIndexOf('good');
+    expect(slots[0].severity).toBe('good');
+    expect(lastGood).toBeLessThan(firstTradeoff);
+  });
+
+  it('부분(+7) > 불참(-4) 계약은 tradeoff 계층 안에서 산다 — 준호 부분 슬롯이 계층 선두', () => {
+    const { slots } = compute();
+    const tradeoffs = slots.filter((s) => s.severity === 'tradeoff');
+    expect(tradeoffs[0]?.partials.some((p) => p.attendeeId === 'junho')).toBe(true);
+  });
+});
