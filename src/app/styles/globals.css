@@ -21,7 +21,8 @@
   --color-alert: #f03e3e;
   --radius-card: 16px;
 
-  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  /* 라틴·숫자는 Overused Grotesk(--font-latin, RootLayout에서 주입), 한글은 Pretendard */
+  --font-sans: var(--font-latin), 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
   /* 굵기 단계를 통째로 한 칸씩 가볍게 — 위계는 유지하고 전체 인상만 덜어 낸다. */
   --font-weight-light: 300;
@@ -44,7 +45,6 @@
 body {
   font-family: var(--font-sans);
   font-weight: var(--font-weight-normal);
-  font-feature-settings: 'tnum' 1;
 }
 
 /* 누를 수 있는 것은 손 모양 커서 — Tailwind 4 기본값은 버튼도 화살표다. */
