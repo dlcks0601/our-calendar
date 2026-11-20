@@ -91,7 +91,7 @@ npm run dev        # http://localhost:3000
 - **사람도 색으로 구분합니다.** 시간 찾기의 타임라인에서 누가 언제 바쁜지를 사람마다 다른 색으로 보여 줍니다.
 - **파란 계열은 쓰지 않습니다.** 주요 행동과 선택은 순수한 검정 면입니다.
 - 경고는 호박, 새 알림은 빨간 점입니다.
-- 글자는 가볍게 둡니다(Pretendard, 굵기 300~560). 무게는 글자가 아니라 검정 면이 집니다.
+- 글자는 가볍게 둡니다(굵기 300~560). 라틴 글자와 숫자는 Overused Grotesk, 한글은 Pretendard입니다. 무게는 글자가 아니라 검정 면이 집니다.
 - 로고는 심벌 없이 글자만 씁니다. `our`는 진하게, `calendar`는 옅게 씁니다.
 
 토큰은 `src/app/styles/globals.css`, 일정 종류별 색은 `src/entities/event/model/kind-style.ts`에 있습니다.
@@ -156,3 +156,5 @@ npm run build
 ## 기술
 
 Next.js 16(App Router), React 19, TypeScript, Tailwind CSS 4, Motion, Vitest, Steiger.
+
+글꼴: [Overused Grotesk](https://github.com/RandomMaerks/Overused-Grotesk)(SIL OFL 1.1, 라이선스 전문은 `src/app/fonts/OverusedGrotesk-OFL.txt`), [Pretendard](https://github.com/orioncactus/pretendard)(SIL OFL 1.1).
