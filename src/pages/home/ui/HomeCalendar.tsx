@@ -7,6 +7,8 @@ import { Avatar, type Person } from '@/entities/member';
 import { type CalendarEvent, eventsOn, styleFor } from '@/entities/event';
 import { fmtRange } from '@/shared/lib/time';
 import { TODAY, WEEK_COUNT, DAY_START, DAY_END, clampWeek, weekDays, ANCHOR_MONTH_LABEL, buildMonthCells, weekIndexOfDay, yPct } from '@/shared/lib/calendar-grid';
+import { SPRING } from '@/shared/tokens';
+import { IconButton } from '@/shared/ui/icon-button';
 
 /**
  * 홈 캘린더 — 내(이찬) 주간 일정 + 캘린더 안에 살고 있는 받은 초대(고스트 이벤트).
@@ -25,12 +27,12 @@ const GHOST_CARD =
   // isolate: after:-z-10 글로우가 조상 배경 뒤로 꺼지지 않게 버튼 자신을 스태킹 컨텍스트로.
   // 주의: 여기에 relative를 넣으면 데스크톱 고스트의 absolute와 충돌해 카드가 흐름 배치로
   // 떨어진다(폭 쪼그라듦) — position은 사용처가 각자 정한다(데스크톱 absolute/모바일 relative).
-  'group isolate border-2 border-dashed border-[#B9DBF1] bg-transparent ' +
-  'transition-[background-color,border-color] duration-200 hover:z-10 hover:border-transparent hover:bg-primary ' +
+  'group isolate border-2 border-dashed border-sky-200 bg-transparent ' +
+  'transition-[background-color,border-color] duration-200 hover:z-10 hover:border-transparent hover:bg-ink ' +
   'after:pointer-events-none after:absolute after:-inset-px after:-z-10 after:rounded-[inherit] ' +
-  'after:shadow-[0_10px_32px_rgba(0,0,0,0.36)] after:opacity-0 after:transition-opacity after:duration-200 hover:after:opacity-100';
-const GHOST_TITLE_CLS = 'text-[#136A99] transition-colors duration-200 group-hover:text-white';
-const GHOST_SUB_CLS = 'text-[#4A93BD] transition-colors duration-200 group-hover:text-white/80';
+  'after:shadow-s4 after:opacity-0 after:transition-opacity after:duration-200 hover:after:opacity-100';
+const GHOST_TITLE_CLS = 'text-sky-800 transition-colors duration-200 group-hover:text-on-ink';
+const GHOST_SUB_CLS = 'text-sky-600 transition-colors duration-200 group-hover:text-on-ink/80';
 
 const WEEKDAY_LABELS = ['월', '화', '수', '목', '금'] as const;
 
@@ -43,7 +45,7 @@ export interface ResponseBadges {
   people: Person[];
 }
 
-const BADGE_POP = { type: 'spring' as const, stiffness: 500, damping: 18 };
+const BADGE_POP = SPRING.pop;
 
 /** 아바타 미니 스택 — 새 응답이 오면 한 명씩 제자리 팝으로 나타난다. */
 function BadgeStack({ people }: { people: Person[] }) {
@@ -56,7 +58,7 @@ function BadgeStack({ people }: { people: Person[] }) {
           initial={reduced ? { opacity: 0 } : { scale: 0 }}
           animate={reduced ? { opacity: 1 } : { scale: 1 }}
           transition={reduced ? { duration: 0.1 } : BADGE_POP}
-          className="rounded-full ring-2 ring-white"
+          className="rounded-full ring-2 ring-gray-0"
         >
           <Avatar person={p} size={24} />
         </motion.span>
@@ -88,7 +90,7 @@ function MobileDayList({
   responseBadges?: ResponseBadges | null;
 }) {
   if (events.length === 0 && !ghost) {
-    return <p className="py-10 text-center text-[13px] text-text-faint">이 날은 일정이 없어요</p>;
+    return <p className="py-10 text-center text-body-s text-faint">이 날은 일정이 없어요</p>;
   }
   const badgesFor = (ev: CalendarEvent) =>
     responseBadges && responseBadges.eventId === ev.id ? responseBadges.people : null;
@@ -103,12 +105,12 @@ function MobileDayList({
         <button
           type="button"
           onClick={onOpenInvite}
-          className={`pressable relative w-full rounded-2xl px-4 py-3.5 text-left ${GHOST_CARD}`}
+          className={`pressable relative w-full rounded-r5 px-4 py-3.5 text-left ${GHOST_CARD}`}
           style={{ minHeight: mobileRowHeight({ start: ghost.start, end: ghost.end } as CalendarEvent) }}
         >
-          <p className={`truncate text-[14px] font-semibold ${GHOST_TITLE_CLS}`}>{ghost.title}</p>
-          <p className={`mt-0.5 text-[12px] ${GHOST_SUB_CLS}`}>{fmtRange(ghost.start, ghost.end)} · 응답 대기</p>
-          {ghost.room && <p className={`mt-px text-[12px] ${GHOST_SUB_CLS}`}>{ghost.room}</p>}
+          <p className={`truncate text-body font-semibold ${GHOST_TITLE_CLS}`}>{ghost.title}</p>
+          <p className={`mt-0.5 text-label ${GHOST_SUB_CLS}`}>{fmtRange(ghost.start, ghost.end)} · 응답 대기</p>
+          {ghost.room && <p className={`mt-px text-label ${GHOST_SUB_CLS}`}>{ghost.room}</p>}
         </button>
       )}
       {ghostIndex !== -1 &&
@@ -127,18 +129,18 @@ function MobileEventRow({ ev, badges }: { ev: CalendarEvent; badges?: Person[] |
   const st = styleFor(ev);
   return (
     <div
-      className="flex items-start gap-3 rounded-2xl px-4 py-3.5"
+      className="flex items-start gap-3 rounded-r5 px-4 py-3.5"
       style={{ backgroundColor: st.bg, minHeight: mobileRowHeight(ev) }}
     >
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[14px] font-semibold" style={{ color: st.title }}>
+        <p className="truncate text-body font-semibold" style={{ color: st.title }}>
           {ev.title}
         </p>
-        <p className="mt-0.5 text-[12px]" style={{ color: st.sub }}>
+        <p className="mt-0.5 text-label" style={{ color: st.sub }}>
           {fmtRange(ev.start, ev.end)}
         </p>
         {ev.room && (
-          <p className="mt-px text-[12px]" style={{ color: st.sub }}>
+          <p className="mt-px text-label" style={{ color: st.sub }}>
             {ev.room}
           </p>
         )}
@@ -223,15 +225,14 @@ export default function HomeCalendar({ events, invite, onOpenInvite, responseBad
       {/* ── 헤더: 월 + 범위 + 주 이동 + (데스크톱) CTA ── */}
       <div className="flex items-center justify-between">
         <div className="relative flex items-center gap-0.5">
-          <button
-            type="button"
+          <IconButton size="sm" tone="default"
             onClick={() => goWeek(-1)}
             disabled={week === 0}
             aria-label="이전 주"
-            className="pressable flex h-8 w-8 items-center justify-center rounded-full text-text-body hover:bg-section disabled:pointer-events-none disabled:text-text-faint"
+            className="disabled:pointer-events-none"
           >
             <ChevronLeft size={17} aria-hidden />
-          </button>
+          </IconButton>
           {/* 월 + 주 범위 — 베이스라인 정렬(작은 글자가 큰 글자의 밑줄에 앉는다) */}
           <div className="flex items-baseline">
             <button
@@ -239,23 +240,22 @@ export default function HomeCalendar({ events, invite, onOpenInvite, responseBad
               onClick={() => setMonthOpen(!monthOpen)}
               aria-expanded={monthOpen}
               aria-label="월간 달력 열기"
-              className="pressable rounded-lg px-1.5 text-[20px] font-bold tracking-[-0.02em] text-text-strong hover:bg-section lg:text-[22px]"
+              className="pressable rounded-r2 px-1.5 text-title-l font-bold tracking-tight text-strong hover:bg-subtle lg:text-heading"
             >
               {Number(month)}월
             </button>
-            <span className="mx-1 text-[13px] font-medium text-text-weak lg:text-[14px]">
+            <span className="mx-1 text-body-s font-medium text-muted lg:text-body">
               {Number(days[0].slice(8, 10))}일 – {Number(days[days.length - 1].slice(8, 10))}일
             </span>
           </div>
-          <button
-            type="button"
+          <IconButton size="sm" tone="default"
             onClick={() => goWeek(1)}
             disabled={week === WEEK_COUNT - 1}
             aria-label="다음 주"
-            className="pressable flex h-8 w-8 items-center justify-center rounded-full text-text-body hover:bg-section disabled:pointer-events-none disabled:text-text-faint"
+            className="disabled:pointer-events-none"
           >
             <ChevronRight size={17} aria-hidden />
-          </button>
+          </IconButton>
 
           {/* 월간 피커 팝오버 — 일~토 그리드, 오늘=검은 칩, 일정 있는 날=점 */}
           <AnimatePresence>
@@ -269,13 +269,13 @@ export default function HomeCalendar({ events, invite, onOpenInvite, responseBad
                   initial={reduced ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.97 }}
                   animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
                   exit={reduced ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.97 }}
-                  transition={reduced ? { duration: 0.12 } : { type: 'spring', stiffness: 350, damping: 30 }}
+                  transition={reduced ? { duration: 0.12 } : SPRING.position}
                   style={{ transformOrigin: 'top left' }}
-                  className="absolute left-0 top-full z-[65] mt-2 w-[340px] rounded-[24px] bg-white p-5 shadow-[0_16px_40px_rgba(30,30,30,0.14),0_2px_8px_rgba(30,30,30,0.06)] ring-1 ring-border/60"
+                  className="absolute left-0 top-full z-[65] mt-2 w-[340px] rounded-r6 bg-page p-5 shadow-s4 ring-1 ring-default/60"
                 >
                   <div className="grid grid-cols-7 pb-2">
                     {['일', '월', '화', '수', '목', '금', '토'].map((d) => (
-                      <span key={d} className="py-1 text-center text-[13px] text-text-faint">
+                      <span key={d} className="py-1 text-center text-body-s text-faint">
                         {d}
                       </span>
                     ))}
@@ -291,19 +291,19 @@ export default function HomeCalendar({ events, invite, onOpenInvite, responseBad
                           type="button"
                           disabled={!navigable}
                           onClick={() => goToDay(day)}
-                          className={`pressable relative mx-auto flex h-10 w-10 items-center justify-center rounded-[13px] text-[16px] font-semibold ${
+                          className={`pressable relative mx-auto flex h-10 w-10 items-center justify-center rounded-r4 text-title-s font-semibold ${
                             today
-                              ? 'bg-primary text-white'
+                              ? 'bg-ink text-on-ink'
                               : navigable
-                                ? 'text-text-strong hover:bg-section'
+                                ? 'text-strong hover:bg-subtle'
                                 : inMonth
-                                  ? 'text-text-faint'
-                                  : 'text-border'
+                                  ? 'text-faint'
+                                  : 'text-disabled'
                           } disabled:pointer-events-none`}
                         >
                           {dayNumber(day)}
                           {dotted && !today && (
-                            <span aria-hidden className="absolute bottom-[3px] h-1 w-1 rounded-full bg-primary/60" />
+                            <span aria-hidden className="absolute bottom-[3px] h-1 w-1 rounded-full bg-ink/60" />
                           )}
                         </button>
                       );
@@ -318,23 +318,23 @@ export default function HomeCalendar({ events, invite, onOpenInvite, responseBad
       </div>
 
       {/* ── 데스크톱: 5열 주간 그리드 — bg 없음: 흰 페이지 배경이 헤더~그리드로 이어진다 ── */}
-      <div className="mt-3 hidden overflow-hidden rounded-[20px] px-2 lg:block">
+      <div className="mt-3 hidden overflow-hidden rounded-r6 px-2 lg:block">
         <AnimatePresence mode="wait" initial={false}>
         <motion.div key={week} {...weekFade}>
         {/* 요일 헤더 */}
-        <div className="flex border-b border-border/70">
+        <div className="flex border-b border-default/70">
           <div className="w-[44px] shrink-0" aria-hidden />
           {days.map((day, i) => {
             const today = day === TODAY;
             return (
               <div key={day} className="flex flex-1 flex-col items-center gap-0.5 py-2.5">
                 {/* 요일 위 + 날짜 아래 — 모바일과 같은 세로 스택, 높이는 압축. */}
-                <span className={`text-[10.5px] leading-4 ${today ? 'font-semibold text-primary' : 'text-text-weak'}`}>
+                <span className={`text-caption leading-4 ${today ? 'font-semibold text-strong' : 'text-muted'}`}>
                   {WEEKDAY_LABELS[i]}
                 </span>
                 <span
-                  className={`flex h-7 w-7 items-center justify-center rounded-full text-[14px] font-semibold ${
-                    today ? 'bg-primary text-white' : 'text-text-strong'
+                  className={`flex h-7 w-7 items-center justify-center rounded-full text-body font-semibold ${
+                    today ? 'bg-ink text-on-ink' : 'text-strong'
                   }`}
                 >
                   {dayNumber(day)}
@@ -354,7 +354,7 @@ export default function HomeCalendar({ events, invite, onOpenInvite, responseBad
               return (
                 <span
                   key={h}
-                  className={`absolute right-2 text-[11px] text-text-faint ${first ? '' : last ? '-translate-y-full' : '-translate-y-1/2'}`}
+                  className={`absolute right-2 text-caption text-faint ${first ? '' : last ? '-translate-y-full' : '-translate-y-1/2'}`}
                   style={{ top: `${(i / (hours.length - 1)) * 100}%` }}
                 >
                   {hourLabel(h)}
@@ -378,14 +378,14 @@ export default function HomeCalendar({ events, invite, onOpenInvite, responseBad
                   return (
                     <div
                       key={ev.id}
-                      className="absolute inset-x-1.5 overflow-hidden rounded-xl px-3 py-2"
+                      className="absolute inset-x-1.5 overflow-hidden rounded-r4 px-3 py-2"
                       style={{ top: `calc(${top}% + 3px)`, height: `calc(${height}% - 6px)`, backgroundColor: st.bg }}
                     >
-                      <p className="truncate text-[13px] font-bold leading-[1.3]" style={{ color: st.title }}>
+                      <p className="truncate text-body-s font-bold leading-dense" style={{ color: st.title }}>
                         {ev.title}
                       </p>
                       {!compact && (
-                        <p className="truncate text-[11px] font-medium leading-[1.3]" style={{ color: st.sub }}>
+                        <p className="truncate text-caption font-medium leading-dense" style={{ color: st.sub }}>
                           {fmtRange(ev.start, ev.end)}
                           {ev.room ? `, ${ev.room}` : ''}
                         </p>
@@ -402,14 +402,14 @@ export default function HomeCalendar({ events, invite, onOpenInvite, responseBad
                   <button
                     type="button"
                     onClick={onOpenInvite}
-                    className={`pressable absolute inset-x-1.5 rounded-xl px-3 py-2 text-left ${GHOST_CARD}`}
+                    className={`pressable absolute inset-x-1.5 rounded-r4 px-3 py-2 text-left ${GHOST_CARD}`}
                     style={{
                       top: `calc(${yPct(ghost.start)}% + 3px)`,
                       height: `calc(${yPct(ghost.end) - yPct(ghost.start)}% - 6px)`,
                     }}
                   >
-                    <p className={`truncate text-[13px] font-bold leading-[1.3] ${GHOST_TITLE_CLS}`}>{ghost.title}</p>
-                    <p className={`truncate text-[11px] font-medium leading-[1.3] ${GHOST_SUB_CLS}`}>
+                    <p className={`truncate text-body-s font-bold leading-dense ${GHOST_TITLE_CLS}`}>{ghost.title}</p>
+                    <p className={`truncate text-caption font-medium leading-dense ${GHOST_SUB_CLS}`}>
                       {fmtRange(ghost.start, ghost.end)}
                       {ghost.room ? `, ${ghost.room}` : ''} · 응답 대기
                     </p>
@@ -438,20 +438,20 @@ export default function HomeCalendar({ events, invite, onOpenInvite, responseBad
                 type="button"
                 onClick={() => setSelectedDay(day)}
                 aria-pressed={selected}
-                className="pressable flex flex-col items-center gap-1 rounded-xl py-2"
+                className="pressable flex flex-col items-center gap-1 rounded-r4 py-2"
               >
-                <span className={`text-[11px] ${selected || today ? 'font-semibold text-primary' : 'text-text-weak'}`}>
+                <span className={`text-caption ${selected || today ? 'font-semibold text-strong' : 'text-muted'}`}>
                   {WEEKDAY_LABELS[i]}
                 </span>
                 <span
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-[15px] font-semibold ${
-                    selected ? 'bg-primary text-white' : today ? 'text-primary' : 'text-text-strong'
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-body-l font-semibold ${
+                    selected ? 'bg-ink text-on-ink' : today ? 'text-strong' : 'text-strong'
                   }`}
                 >
                   {dayNumber(day)}
                 </span>
                 <span
-                  className={`h-1 w-1 rounded-full ${today && !selected ? 'bg-primary' : 'bg-transparent'}`}
+                  className={`h-1 w-1 rounded-full ${today && !selected ? 'bg-ink' : 'bg-transparent'}`}
                   aria-hidden
                 />
               </button>
