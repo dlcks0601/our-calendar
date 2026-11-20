@@ -38,11 +38,12 @@ button:not(:disabled),
 
 /* 프레스 스쿼시 — 전 버튼·칩 공용 */
 .pressable { transition: transform 320ms var(--bezier-standard), background-color 320ms var(--bezier-standard); }
-.pressable:active { transform: scale(0.96); transition-duration: 120ms; }
+/* 비활성 버튼은 눌려도 줄어들지 않는다. */
+.pressable:not(:disabled):active { transform: scale(0.96); transition-duration: 120ms; }
 /* 포커스 — 마우스 클릭 뒤 남는 UA 기본 링 제거, 키보드 포커스만 의도된 링으로. */
 .pressable:focus { outline: none; }
 .pressable:focus-visible { outline: 2px solid rgba(0, 0, 0, 0.6); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .pressable, .pressable:active { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pressable, .pressable:not(:disabled):active { transform: none; } }
 
 /* 스쿼클 — 연속 곡률 코너(iOS·피그마 corner smoothing 문법). 점진적 향상:
    미지원 브라우저는 이 블록을 통째로 무시하고 일반 라운드로 본다.
