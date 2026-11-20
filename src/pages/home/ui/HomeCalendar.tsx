@@ -25,12 +25,12 @@ const GHOST_CARD =
   // isolate: after:-z-10 글로우가 조상 배경 뒤로 꺼지지 않게 버튼 자신을 스태킹 컨텍스트로.
   // 주의: 여기에 relative를 넣으면 데스크톱 고스트의 absolute와 충돌해 카드가 흐름 배치로
   // 떨어진다(폭 쪼그라듦) — position은 사용처가 각자 정한다(데스크톱 absolute/모바일 relative).
-  'group isolate border-2 border-dashed border-[#CFC5DA] bg-transparent ' +
+  'group isolate border-2 border-dashed border-[#C5D9E8] bg-transparent ' +
   'transition-[background-color,border-color] duration-200 hover:z-10 hover:border-transparent hover:bg-primary ' +
   'after:pointer-events-none after:absolute after:-inset-px after:-z-10 after:rounded-[inherit] ' +
   'after:shadow-[0_10px_32px_rgba(0,0,0,0.36)] after:opacity-0 after:transition-opacity after:duration-200 hover:after:opacity-100';
-const GHOST_TITLE_CLS = 'text-[#54456A] transition-colors duration-200 group-hover:text-white';
-const GHOST_SUB_CLS = 'text-[#7C6E90] transition-colors duration-200 group-hover:text-white/80';
+const GHOST_TITLE_CLS = 'text-[#2C5A78] transition-colors duration-200 group-hover:text-white';
+const GHOST_SUB_CLS = 'text-[#5F87A3] transition-colors duration-200 group-hover:text-white/80';
 
 const WEEKDAY_LABELS = ['월', '화', '수', '목', '금'] as const;
 

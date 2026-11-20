@@ -72,7 +72,7 @@ const POP_SPRING = { type: 'spring' as const, stiffness: 500, damping: 18 };
 const DONE_BLOBS = [
   'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-[#EDDDD6] opacity-60',
   'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-[#EFE7D6] opacity-55',
-  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#E3DCEB] opacity-50',
+  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#DCE8F1] opacity-50',
   'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-[#EDDFE4] opacity-50',
   'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-[#F1EEE8] opacity-50',
 ];
