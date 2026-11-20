@@ -14,11 +14,11 @@ export interface AuroraProps {
   variant?: AuroraVariant;
 }
 
-/** 실측 3색 — 하늘 / 복숭아 / 옅은 블루 (+scan 전용 딥 블루 계열) */
-const SKY = 'rgba(168,80,255,.10)';
-const PEACH = 'rgba(255,220,200,.2)';
-const PALE = 'rgba(227,200,255,.14)';
-const DEEP = 'rgba(177,120,234,.12)';
+/** 무채색 4단계 — 검정을 옅게 깔아 흰색으로 풀어지는 그라데이션. 색은 쓰지 않는다. */
+const SKY = 'rgba(0,0,0,.075)';
+const PEACH = 'rgba(0,0,0,.04)';
+const PALE = 'rgba(0,0,0,.055)';
+const DEEP = 'rgba(0,0,0,.09)';
 
 interface AuroraLayer {
   /** radial-gradient 한 장 — 큰 타원 + transparent 종단으로 부드러운 falloff */
@@ -33,8 +33,7 @@ const glow = (color: string, w: number, h: number, x: number, y: number) =>
   `radial-gradient(${w}% ${h}% at ${x}% ${y}%, ${color}, transparent)`;
 
 /**
- * home = 은은한 블루 공기감(복숭아는 기척만) / scan = 더 깊은 블루 맥락 강조 /
- * done = 가장 따뜻하게(복숭아가 앞으로 나온다).
+ * home = 은은하게 / scan = 조금 더 깊게 / done = 넓고 옅게. 셋 다 무채색이다.
  */
 const LAYERS: Record<AuroraVariant, AuroraLayer[]> = {
   home: [
@@ -52,7 +51,7 @@ const LAYERS: Record<AuroraVariant, AuroraLayer[]> = {
     { background: glow(PEACH, 88, 66, 34, 34), opacity: 1, drift: 1 },
     { background: glow(PEACH, 70, 54, 72, 68), opacity: 0.9, drift: 4 },
     { background: glow(SKY, 60, 46, 80, 20), opacity: 0.5, drift: 2 },
-    { background: glow('rgba(255,255,187,.22)', 74, 58, 55, 78), opacity: 0.85, drift: 3 },
+    { background: glow(PALE, 74, 58, 55, 78), opacity: 0.85, drift: 3 },
   ],
 };
 
