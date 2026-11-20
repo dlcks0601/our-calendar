@@ -8,7 +8,9 @@
     "start": "next start",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --noEmit",
-    "lint:fsd": "steiger ./src"
+    "lint:fsd": "steiger ./src",
+    "visual:capture": "node scripts/visual/capture.mjs",
+    "visual:compare": "node scripts/visual/compare.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.23.0",
@@ -25,6 +27,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
     "steiger": "^0.5.11",
     "tailwindcss": "^4",
     "typescript": "^5",
