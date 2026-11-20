@@ -3,7 +3,6 @@
 import { Fragment, useMemo, useState, type Dispatch, type ReactNode } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Check, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Aurora } from '@/shared/ui/aurora';
 import { Avatar, type Attendee } from '@/entities/member';
 import { FrostedBar } from '@/shared/ui/frosted-bar';
 import { MobileSheet } from '@/shared/ui/mobile-sheet';
@@ -644,12 +643,8 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
 
   return (
     <div className="min-h-dvh bg-bg pb-32 lg:pb-12">
-      {/* 데스크톱 헤더 — 셋업·홈과 같은 오로라·워드마크 틀 */}
+      {/* 데스크톱 헤더 — 셋업·홈과 같은 워드마크 틀 */}
       <div className="relative hidden lg:block">
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <Aurora variant="home" />
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-white" />
-        </div>
         <div className="relative mx-auto max-w-[1200px] px-6 py-4">
           <header className="flex h-10 items-center">
             <Wordmark />

@@ -4,7 +4,6 @@ import { useMemo, useState, type Dispatch, type ReactNode } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ChevronLeft, ChevronsUpDown, Plus, X } from 'lucide-react';
 import AttendeePicker from './AttendeePicker';
-import { Aurora } from '@/shared/ui/aurora';
 import { Avatar, ME_ID, ORG, type Person } from '@/entities/member';
 import { Chip } from '@/shared/ui/chip';
 import { FrostedBar } from '@/shared/ui/frosted-bar';
@@ -381,12 +380,8 @@ export default function SetupForm({ state, dispatch, onSaved }: SetupFormProps) 
   // pb: 모바일은 고정 CTA(≈94px) 위 여유, PC는 고정층이 없어 숨 쉴 틈 48px이면 충분.
   return (
     <div className="min-h-dvh bg-bg pb-32 lg:pb-12">
-      {/* 데스크톱 헤더 — 홈과 같은 오로라·워드마크. 스텝이 바뀌어도 페이지 틀은 유지된다. */}
+      {/* 데스크톱 헤더 — 홈과 같은 워드마크. 스텝이 바뀌어도 페이지 틀은 유지된다. */}
       <div className="relative hidden lg:block">
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <Aurora variant="home" />
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-white" />
-        </div>
         <div className="relative mx-auto max-w-[1200px] px-6 py-4">
           {/* h-10 — 홈 헤더 줄(우측 버튼 36px 때문에 40px)과 로고 세로 위치를 맞춘다. */}
           <header className="flex h-10 items-center">
