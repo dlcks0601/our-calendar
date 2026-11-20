@@ -347,7 +347,7 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
                       initial={{ opacity: 0, y: -6, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -4, scale: 0.98 }}
-                      transition={reduced ? { duration: 0 } : SPRING.sheet}
+                      transition={reduced ? { duration: 0 } : SPRING.popover}
                       style={{ transformOrigin: 'top' }}
                       className="absolute inset-x-0 top-[calc(100%+6px)] z-40 rounded-r5 bg-page p-1.5 shadow-s4 ring-1 ring-default/60"
                     >

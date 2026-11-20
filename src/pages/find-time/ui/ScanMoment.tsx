@@ -33,10 +33,10 @@ export interface ScanMomentProps {
  *  각 색이 코너 하나씩을 소유하고 이음새에서만 섞인다 — 전부 겹치면 색이 죽는다(머디 워시 금지).
  *  가운데는 가장 밝게 남아 검정 헤드라인의 자리가 된다. */
 const BLOBS = [
-  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-sky-200 opacity-60',
-  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-green-200 opacity-55',
-  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-coral-200 opacity-55',
-  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-yellow-200 opacity-55',
+  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-sky-100 opacity-60',
+  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-green-100 opacity-55',
+  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-coral-100 opacity-55',
+  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-yellow-100 opacity-55',
   // 가운데 — 코너 색들의 다리(연한 페리윙클). 헤드라인 가독을 지키는 가장 옅은 톤.
   'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-stone-100 opacity-45',
 ];
@@ -149,7 +149,7 @@ export default function ScanMoment({ attendees, duration, onDone }: ScanMomentPr
                       <div className="relative my-[5px] min-h-[18px] w-[3px] flex-1 overflow-hidden rounded-full bg-subtle">
                         <span
                           aria-hidden
-                          className="absolute inset-0 origin-top rounded-full bg-gradient-to-b from-gray-1000 to-gray-500"
+                          className="absolute inset-0 origin-top rounded-full bg-gradient-to-b from-ink to-gray-500"
                           style={{
                             transform: 'scaleY(0)',
                             animation:

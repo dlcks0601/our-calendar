@@ -16,7 +16,9 @@
   --color-gray-300: #D6D6D6;
   --color-gray-400: #B8B8B8;
   --color-gray-500: #8C8C8C;
+  --color-gray-600: #6B6B6B;
   --color-gray-700: #4A4A4A;
+  --color-gray-800: #3C3C3C;
   --color-gray-900: #2E2E2E;
   --color-gray-1000: #000000;
   --color-sky-100: #DDF0FB;
@@ -68,24 +70,33 @@
 
   /* 바탕 색 */
   --background-color-page: #FFFFFF;
+  --background-color-faint: #F7F7F7;
   --background-color-subtle: #F4F4F4;
   --background-color-muted: #E6E6E6;
   --background-color-ink: #000000;
   --background-color-ink-pressed: #2E2E2E;
+  --background-color-ink-soft: #2E2E2E;
   --background-color-warning-weak: #FCF1D6;
+  --background-color-warning: #8A6410;
   --background-color-positive: #1F7A4B;
   --background-color-alert: #F03E3E;
 
   /* 선 색 */
   --border-color-default: #E6E6E6;
   --border-color-strong: #D6D6D6;
+  --border-color-faint: #B8B8B8;
   --border-color-ink: #000000;
+  --border-color-page: #FFFFFF;
   --ring-color-default: #E6E6E6;
   --ring-color-strong: #D6D6D6;
+  --ring-color-faint: #B8B8B8;
   --ring-color-ink: #000000;
+  --ring-color-page: #FFFFFF;
   --divide-color-default: #E6E6E6;
   --divide-color-strong: #D6D6D6;
+  --divide-color-faint: #B8B8B8;
   --divide-color-ink: #000000;
+  --divide-color-page: #FFFFFF;
 
   /* 글꼴과 굵기 */
   --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;

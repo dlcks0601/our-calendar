@@ -58,7 +58,7 @@ function BadgeStack({ people }: { people: Person[] }) {
           initial={reduced ? { opacity: 0 } : { scale: 0 }}
           animate={reduced ? { opacity: 1 } : { scale: 1 }}
           transition={reduced ? { duration: 0.1 } : BADGE_POP}
-          className="rounded-full ring-2 ring-gray-0"
+          className="rounded-full ring-2 ring-page"
         >
           <Avatar person={p} size={24} />
         </motion.span>

@@ -21,10 +21,10 @@ const NAV = [
 
 const PRINCIPLES = [
   ['명세가 원천이다', '색, 글자, 모서리, 그림자, 모션의 값은 명세 한 곳에만 있다. CSS 변수는 거기서 생성하고, 생성물은 직접 고치지 않는다.'],
-  ['검정이 주 행동이다', '화면에서 가장 진한 것이 지금 누를 것이다. 한 화면에 검정 면은 하나만 둔다.'],
+  ['검정은 주 행동과 선택에만 쓴다', '화면에서 가장 진한 것은 지금 누를 것이거나 지금 고른 것이다. 그 밖의 면은 검정으로 칠하지 않는다.'],
   ['색은 정보에만 쓴다', '일정 종류, 사람, 경고, 새 알림처럼 구분해야 할 것에만 색이 있다. 버튼과 선택은 무채색이다.'],
   ['변형은 고르는 것이다', '버튼의 종류와 크기는 조합표에 정의돼 있고, 화면은 이름만 고른다. 화면에서 값을 새로 만들지 않는다.'],
-  ['지켜야 할 것은 검사한다', '대비, 생성물의 최신 여부, 화면 코드의 임의값은 테스트가 본다. 화면이 달라졌는지는 픽셀 대조가 본다.'],
+  ['지켜야 할 것은 검사한다', '대비, 생성물의 최신 여부, 화면 코드의 임의값과 테마에 없는 클래스는 테스트가 본다. 화면이 달라졌는지는 픽셀 대조가 본다.'],
 ] as const;
 
 const ROLE_GROUPS = [
@@ -41,17 +41,24 @@ const KIND_LABEL: Record<keyof typeof KIND_COLOR, [string, string]> = {
   offsite: ['외근', '파트너사 방문'],
 };
 
-/** 2026-11-20, 디자인 시스템을 올리기 전과 후를 같은 스크립트로 잰 값 */
+/**
+ * 디자인 시스템을 올리기 전과 후를 `scripts/measure-design-values.mjs`로 잰 값(2026-11-20).
+ * 토큰처럼 명세에서 읽을 수 있는 값이 아니라 그날의 측정 기록이라 여기에 적어 둔다.
+ */
 const NUMBERS = [
-  ['글자 크기', '임의값 18종', '13단계'],
-  ['줄 높이', '임의값 8종', '4단계'],
-  ['모서리', '13종', '6단계와 원형'],
-  ['그림자', '임의값 12종', '4단계'],
-  ['코드에 직접 쓴 색', '66종, 110곳', '0곳 (아바타 일러스트 제외)'],
-  ['검정 주 버튼의 클래스 조합', '12종', '컴포넌트 변형 1개'],
-  ['스프링 설정', '6종', '프리셋 3개'],
-  ['토큰', '29개', '127개'],
+  ['글자 크기', '임의값 18종, 159곳', '13단계, 140곳'],
+  ['줄 높이', '임의값 8종, 43곳', '4단계, 38곳'],
+  ['모서리', '12종, 124곳', '8종 (6단계, 원형, 상속), 97곳'],
+  ['그림자', '임의값 12종, 18곳', '4단계, 18곳'],
+  ['코드에 직접 쓴 색', '66종, 110곳', '17종, 17곳 (모두 아바타 일러스트)'],
+  ['직접 쓴 button 요소', '55곳', '32곳'],
+  ['누르는 요소의 클래스 조합', '35종', '20종'],
+  ['그중 검정 면을 쓰는 조합', '12종', '4종 (선택된 날짜 칸과 시간 칩)'],
+  ['스프링 설정', '6종, 17곳', '프리셋 4개, 17곳'],
+  ['테마 CSS 변수', '29개', '138개'],
 ] as const;
+
+const CONTRAST_STATUS = { pass: '통과', miss: '미달', exempt: '대상 아님' } as const;
 
 const SAMPLE = '모두가 괜찮은 시간을 찾아드려요';
 
@@ -107,14 +114,14 @@ export default function DesignSystemPage() {
         <Section
           id="color"
           title="색"
-          lead="팔레트에서 역할로, 역할에서 화면으로 간다. 화면은 팔레트를 직접 쓰지 않고 역할 이름으로 쓴다."
+          lead="팔레트에서 역할로, 역할에서 화면으로 간다. 무채색은 역할 이름으로만 쓰고(테스트가 지킨다), 색 계열은 일정 종류나 사람처럼 색이 곧 정보인 곳에서 팔레트 단계를 직접 쓴다."
         >
           <Group title="팔레트" note="계열별 단계표. 숫자가 클수록 진하다. 실제로 쓰는 단계만 둔다.">
             <div className="space-y-4">
               {Object.entries(TOKENS.palette).map(([family, steps]) => (
                 <div key={family} className="grid grid-cols-[72px_1fr] items-start gap-3">
                   <p className="pt-3.5 text-body-s font-semibold text-strong">{family}</p>
-                  <div className="grid grid-cols-5 gap-2 lg:grid-cols-10">
+                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-12">
                     {Object.entries(steps).map(([step, value]) => (
                       <Swatch key={step} color={value} label={step} note={value} />
                     ))}
@@ -274,11 +281,12 @@ export default function DesignSystemPage() {
         <Section
           id="contrast"
           title="대비"
-          lead="화면에서 실제로 쓰는 글자와 바탕 조합입니다. 본문 글자는 4.5:1, 보조 글자는 3:1을 지켜야 하고, 하나라도 어기면 테스트가 실패합니다."
+          lead="글자 역할마다 화면에서 놓이는 바탕과의 대비입니다. 본문 글자는 WCAG AA인 4.5:1을 지킵니다. 보조 글자는 이 제품이 정한 3:1을 지키지만, 작은 글자에 4.5:1을 요구하는 AA에는 못 미칩니다. 기준을 넘지 못하는 조합도 숨기지 않고 이유와 함께 적습니다."
         >
           <ul className="grid gap-x-10 lg:grid-cols-2">
             {CONTRAST_PAIRS.map((pair) => {
               const ratio = contrastRatio(pair.fg, pair.bg);
+              const status = pair.waiver?.type ?? 'pass';
               return (
                 <li key={pair.label} className="flex items-center gap-3 border-b border-default py-2">
                   <span
@@ -287,10 +295,18 @@ export default function DesignSystemPage() {
                   >
                     가
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-body-s text-strong">{pair.label}</span>
-                  <Value>
-                    {ratio.toFixed(2)} : 1 · 기준 {pair.min}
-                  </Value>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-body-s text-strong">{pair.label}</span>
+                    {pair.waiver && <span className="block break-keep text-caption text-muted">{pair.waiver.reason}</span>}
+                  </span>
+                  <span className="shrink-0 text-right">
+                    <Value>
+                      {ratio.toFixed(2)} : 1 · 기준 {pair.min}
+                    </Value>
+                    <span className={`block text-caption ${status === 'pass' ? 'text-muted' : 'font-semibold text-strong'}`}>
+                      {CONTRAST_STATUS[status]}
+                    </span>
+                  </span>
                 </li>
               );
             })}
@@ -300,7 +316,7 @@ export default function DesignSystemPage() {
         <Section
           id="numbers"
           title="전후 수치"
-          lead="화면이 먼저 있었고, 디자인 시스템은 나중에 올렸습니다. 흩어져 있던 값을 같은 스크립트로 앞뒤로 재서 남깁니다."
+          lead="화면이 먼저 있었고, 디자인 시스템은 나중에 올렸습니다. 흩어져 있던 값을 같은 스크립트(scripts/measure-design-values.mjs)로 앞뒤로 재서 남깁니다."
         >
           <div className="overflow-x-auto">
             <table className="w-full min-w-[520px] text-left">

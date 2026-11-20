@@ -37,7 +37,7 @@ export function ComponentGallery() {
 
   return (
     <>
-      <Group title="버튼" note="종류는 무게를, 크기는 자리를 정한다. 한 화면에 검정 면(solid)은 하나만 둔다.">
+      <Group title="버튼" note="종류는 무게를, 크기는 자리를 정한다. 검정 면(solid)은 그 화면의 주 행동에만 쓴다.">
         <div className="overflow-x-auto">
           <table className="border-separate border-spacing-x-4 border-spacing-y-3">
             <thead>
