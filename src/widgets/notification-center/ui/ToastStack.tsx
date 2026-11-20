@@ -35,7 +35,7 @@ export function stackPose(depth: number, desktop: boolean): { y: number; scale: 
 export const NOTIFICATION_KIND_STYLE: Record<NotificationKind, { Icon: typeof Check; wrap: string }> = {
   response: { Icon: Check, wrap: 'bg-primary-tint text-primary' },
   invite: { Icon: Mail, wrap: 'bg-section text-text-body' },
-  confirmed: { Icon: PartyPopper, wrap: 'bg-[#F2F2F2] text-[#000000]' },
+  confirmed: { Icon: PartyPopper, wrap: 'bg-[#FCF1D6] text-[#8A6410]' },
 };
 
 /** lg(1024px) 기준 — 토스트는 마운트 이후에만 뜨므로 첫 페인트 불일치 걱정이 없다. */

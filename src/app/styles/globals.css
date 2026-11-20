@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 
-/* our calendar — 검정과 흰색만 쓴다. 강조는 색이 아니라 잉크의 농도로 한다.
+/* our calendar — 바탕은 검정과 흰색이다. 버튼·선택·글자는 무채색으로 두고,
+   색은 정보를 구분할 때만 쓴다(일정 종류, 사람, 경고, 새 알림). 파란 계열은 쓰지 않는다.
    글자는 가볍게 두고(굵기 300~560), 무게는 순수한 검정 면이 진다. */
 @theme {
   --color-primary: #000000;
@@ -13,12 +14,16 @@
   --color-text-body: #4a4a4a;
   --color-text-weak: #8c8c8c;
   --color-text-faint: #b8b8b8;
-  --color-error: #000000;
-  --color-warn-fg: #000000;
-  --color-warn-bg: #ececec;
+  --color-error: #e5342b;
+  --color-warn-fg: #8a6410;
+  --color-warn-bg: #fcf1d6;
+  /* 새 알림이 도착했다는 신호. */
+  --color-alert: #f03e3e;
   --radius-card: 16px;
 
   --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  /* 로고 전용 — Overused Grotesk(--font-wordmark, RootLayout에서 주입) */
+  --font-logo: var(--font-wordmark), 'Pretendard Variable', Pretendard, sans-serif;
 
   /* 굵기 단계를 통째로 한 칸씩 가볍게 — 위계는 유지하고 전체 인상만 덜어 낸다. */
   --font-weight-light: 300;
@@ -44,6 +49,12 @@ body {
   font-feature-settings: 'tnum' 1;
 }
 
+/* 누를 수 있는 것은 손 모양 커서 — Tailwind 4 기본값은 버튼도 화살표다. */
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
 /* 프레스 스쿼시 — 전 버튼·칩 공용 */
 .pressable { transition: transform 320ms var(--bezier-standard), background-color 320ms var(--bezier-standard); }
 .pressable:active { transform: scale(0.96); transition-duration: 120ms; }
@@ -58,27 +69,6 @@ body {
 @supports (corner-shape: squircle) {
   * { corner-shape: squircle; }
   .rounded-full { corner-shape: round; }
-}
-
-/* ── 안개 — 합성 전용. radial-gradient 레이어를 transform만으로 흘려보낸다.
-   blur 필터 금지(그라데이션 falloff가 부드러움을 만든다), 리페인트 0.
-   주기는 서로소(12s/17s/23s/19s) — 패턴이 사실상 반복되지 않는다. ─────── */
-.aurora-layer { position: absolute; inset: 0; will-change: transform; }
-.aurora-l1 { animation: aurora-drift-1 12s var(--bezier-ambient) -4s infinite alternate; }
-.aurora-l2 { animation: aurora-drift-2 17s var(--bezier-ambient) -9s infinite alternate; }
-.aurora-l3 { animation: aurora-drift-3 23s var(--bezier-ambient) -15s infinite alternate; }
-.aurora-l4 { animation: aurora-drift-1 19s var(--bezier-ambient) -6s infinite alternate; }
-@keyframes aurora-drift-1 {
-  from { transform: translate3d(-7%, -5%, 0) scale(1) rotate(-2deg); }
-  to { transform: translate3d(7%, 4%, 0) scale(1.18) rotate(5deg); }
-}
-@keyframes aurora-drift-2 {
-  from { transform: translate3d(6%, 3%, 0) scale(1.12) rotate(3deg); }
-  to { transform: translate3d(-6%, -5%, 0) scale(0.94) rotate(-4deg); }
-}
-@keyframes aurora-drift-3 {
-  from { transform: translate3d(-5%, 6%, 0) scale(1.04); }
-  to { transform: translate3d(6%, -4%, 0) scale(1.2); }
 }
 
 /* ── 리빌 — blur-rise 등장. 페이드 800ms / 상승·선명 900ms, expo-out.
@@ -98,12 +88,12 @@ body {
   to { filter: blur(0); transform: translateY(0); }
 }
 
-/* ── 잉크 광택 — 완료 화면 타이틀 1곳만. clip-text + sheen.
-   DOM 텍스트 유지(접근성) — 검정 위로 옅은 빛이 한 번씩 지나간다. ── */
+/* ── 완료 화면 타이틀 1곳만. clip-text + sheen.
+   DOM 텍스트 유지(접근성) — 검정 글자 위로 옅은 빛이 한 번씩 지나간다. ── */
 .iridescent {
   background-image: linear-gradient(
     100deg,
-    #000000 0%, #000000 30%, #5c5c5c 42%, #000000 54%, #000000 100%
+    #000000 0%, #000000 30%, #6b6b6b 42%, #000000 54%, #000000 100%
   );
   background-size: 250% 100%;
   background-clip: text;
@@ -116,7 +106,7 @@ body {
   to { background-position: -250% 50%; }
 }
 
-/* ── 스캔 모먼트 — 라이트 무대. 회색 블롭 표류(수렴 없음) + 활성 도트 헤일로 숨쉬기 +
+/* ── 스캔 모먼트 — 라이트 무대. 파스텔 블롭 표류(수렴 없음) + 활성 도트 헤일로 숨쉬기 +
    타이틀 시머(왼→오, 저대비 밴드) + 레일 필 차오름. 재생 게이트는 find 화면이 소유. ── */
 .scan-blob-a { animation: scan-drift-a 8s ease-in-out infinite alternate; }
 .scan-blob-b { animation: scan-drift-b 10s ease-in-out infinite alternate; }
@@ -153,7 +143,6 @@ body {
 @keyframes scan-fill { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .aurora-l1, .aurora-l2, .aurora-l3, .aurora-l4 { animation: none; }
   .reveal { animation: none; }
   .iridescent { animation: none; }
   .scan-blob-a, .scan-blob-b, .scan-blob-c, .scan-blob-d, .scan-blob-e, .scan-halo { animation: none; }

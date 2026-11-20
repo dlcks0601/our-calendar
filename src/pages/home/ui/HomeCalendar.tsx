@@ -25,12 +25,12 @@ const GHOST_CARD =
   // isolate: after:-z-10 글로우가 조상 배경 뒤로 꺼지지 않게 버튼 자신을 스태킹 컨텍스트로.
   // 주의: 여기에 relative를 넣으면 데스크톱 고스트의 absolute와 충돌해 카드가 흐름 배치로
   // 떨어진다(폭 쪼그라듦) — position은 사용처가 각자 정한다(데스크톱 absolute/모바일 relative).
-  'group isolate border-2 border-dashed border-[#F4F4F4] bg-transparent ' +
+  'group isolate border-2 border-dashed border-[#B9DBF1] bg-transparent ' +
   'transition-[background-color,border-color] duration-200 hover:z-10 hover:border-transparent hover:bg-primary ' +
   'after:pointer-events-none after:absolute after:-inset-px after:-z-10 after:rounded-[inherit] ' +
-  'after:shadow-[0_10px_32px_rgba(61,61,61,0.6)] after:opacity-0 after:transition-opacity after:duration-200 hover:after:opacity-100';
-const GHOST_TITLE_CLS = 'text-[#000000] transition-colors duration-200 group-hover:text-white';
-const GHOST_SUB_CLS = 'text-[#3D3D3D] transition-colors duration-200 group-hover:text-white/80';
+  'after:shadow-[0_10px_32px_rgba(0,0,0,0.36)] after:opacity-0 after:transition-opacity after:duration-200 hover:after:opacity-100';
+const GHOST_TITLE_CLS = 'text-[#136A99] transition-colors duration-200 group-hover:text-white';
+const GHOST_SUB_CLS = 'text-[#4A93BD] transition-colors duration-200 group-hover:text-white/80';
 
 const WEEKDAY_LABELS = ['월', '화', '수', '목', '금'] as const;
 
@@ -317,7 +317,7 @@ export default function HomeCalendar({ events, invite, onOpenInvite, responseBad
         {/* 일정 만들기 CTA는 페이지가 소유 — 모바일·데스크톱 모두 하단 고정. */}
       </div>
 
-      {/* ── 데스크톱: 5열 주간 그리드 — bg 없음: 페이지 배경 오로라가 헤더~그리드로 이어진다 ── */}
+      {/* ── 데스크톱: 5열 주간 그리드 — bg 없음: 흰 페이지 배경이 헤더~그리드로 이어진다 ── */}
       <div className="mt-3 hidden overflow-hidden rounded-[20px] px-2 lg:block">
         <AnimatePresence mode="wait" initial={false}>
         <motion.div key={week} {...weekFade}>

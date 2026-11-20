@@ -1,7 +1,6 @@
 'use client';
 
 import type { Dispatch } from 'react';
-import { Aurora } from '@/shared/ui/aurora';
 import { FrostedBar } from '@/shared/ui/frosted-bar';
 import HomeCalendar, { type ResponseBadges } from './HomeCalendar';
 import { NotificationBell, type AppNotification } from '@/widgets/notification-center';
@@ -44,12 +43,6 @@ export default function HomePage({
 
   return (
     <div className="relative min-h-dvh bg-bg pb-32 lg:pb-16">
-      {/* 오로라 — 헤더가 아니라 '페이지 배경'이다. 헤더~캘린더 상단까지 하나로 이어지고
-          (끊김 없음), 스크롤하면 배경답게 콘텐츠와 함께 밀려 올라간다. */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-96 overflow-hidden">
-        <Aurora variant="home" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-white" />
-      </div>
 
       {/* 헤더 — 스크롤 연동 베일(FrostedBar와 같은 문법). 정지 상태 = 완전 투명. */}
       <div className="sticky top-0 z-50">

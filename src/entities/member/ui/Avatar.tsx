@@ -17,19 +17,19 @@ import { AVATAR_PALETTE, FACES, faceIdByName, type FaceConfig } from '../api/fac
 // ── 팔레트 (시맨틱 상수) ─────────────────────────────────────────────
 /** 웜 라이트 피부 3종 — base 얼굴, shade 목(턱 아래 분리감) */
 const SKIN_TONES = [
-  { base: '#E8E8E8', shade: '#CDCDCD' }, // 밝은 웜
-  { base: '#DADADA', shade: '#BCBCBC' }, // 중간 웜
-  { base: '#CFCFCF', shade: '#B0B0B0' }, // 약간 태닝
+  { base: '#FFE4CE', shade: '#F1C6A2' }, // 밝은 웜
+  { base: '#F8D5B4', shade: '#E6B48B' }, // 중간 웜
+  { base: '#F2C9A8', shade: '#DCA87E' }, // 약간 태닝
 ] as const;
 
 /** 흑발 / 다크브라운 / 밝은 갈색·애쉬 */
-const HAIR_COLORS = ['#323232', '#3D3D3D', '#797979'] as const;
+const HAIR_COLORS = ['#323232', '#4E3A2C', '#9A7350'] as const;
 
 /** 상의 — 차분한 뉴트럴 3종 순환 + 이찬 전용 잉크(검정) */
 const TOP_COLORS = ['#E8E8E8', '#C1C1C1', '#757575', '#000000'] as const;
 
 const INK = '#3C3C3C'; // 눈·입 딥톤 디테일
-const BLUSH = '#3D3D3D'; // 볼터치
+const BLUSH = '#F79D8A'; // 볼터치
 const FRAME = '#4B4B4B'; // 안경 프레임
 
 // ── 공통 지오메트리 ──────────────────────────────────────────────────

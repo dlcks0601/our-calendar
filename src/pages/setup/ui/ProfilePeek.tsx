@@ -67,7 +67,7 @@ function PeekBody({ person, windowDays }: { person: Person; windowDays: string[]
           const isSel = day === selDay;
           // 색 = 바쁨의 밀도(범례 없이 읽힌다): 개수 따라 회색 → 연분홍 → 분홍으로 데워진다.
           // 외근 여부는 색으로 숨기지 않는다 — 탭한 날 상세와 각주 문장이 글로 말한다.
-          const dotColor = items.length >= 3 ? '#3D3D3D' : items.length === 2 ? '#C5C5C5' : '#B7B7B7';
+          const dotColor = items.length >= 3 ? '#000000' : items.length === 2 ? '#8C8C8C' : '#B7B7B7';
           return (
             <button
               key={day}

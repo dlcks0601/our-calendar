@@ -5,7 +5,7 @@ export function eventsOn(events: readonly CalendarEvent[], day: string): Calenda
   return events.filter((e) => e.day === day).sort((a, b) => a.start - b.start);
 }
 
-// ── 이벤트 종류별 틴트 — 잉크의 농도로 종류를 구분한다 ──────────
+// ── 이벤트 종류별 틴트 — 색이 곧 종류다. 옅은 바탕에 분명한 색. 하늘색은 밝고 맑은 톤만 쓴다 ──
 // (ProfilePeek 미니 캘린더가 같은 팔레트를 공유한다 — 단일 소스)
 
 export interface KindStyle {
@@ -18,16 +18,15 @@ export interface KindStyle {
 }
 
 export const KIND_STYLE: Record<EventKind, KindStyle> = {
-  // 회의가 가장 진하다 — 여러 사람의 시간이 걸린 일정이라 캘린더에서 먼저 읽혀야 한다.
-  meeting: { bg: '#000000', border: '#000000', title: '#FFFFFF', sub: '#A6A6A6', bar: '#000000' },
-  offsite: { bg: '#8E8E8E', border: '#8E8E8E', title: '#FFFFFF', sub: '#E6E6E6', bar: '#6B6B6B' },
-  personal: { bg: '#CDCDCD', border: '#C2C2C2', title: '#000000', sub: '#4A4A4A', bar: '#9E9E9E' },
-  focus: { bg: '#E2E2E2', border: '#D6D6D6', title: '#000000', sub: '#5C5C5C', bar: '#BDBDBD' },
-  // 점심은 가장 옅다 — 조율에서 피해 가는 시간이지 막는 시간이 아니다.
-  lunch: { bg: '#EFEFEF', border: '#E6E6E6', title: '#6B6B6B', sub: '#9A9A9A', bar: '#D9D9D9' },
+  // 옅은 바탕 + 같은 계열의 짙은 글자. 제목은 바탕 대비 4.5:1 이상을 지킨다.
+  meeting: { bg: '#DDF0FB', border: '#C2E0F6', title: '#136A99', sub: '#4A93BD', bar: '#3AA3DA' }, // 하늘
+  focus: { bg: '#DFF3E6', border: '#C3E6CF', title: '#1F7A4B', sub: '#4E9D73', bar: '#3DAE74' }, // 초록
+  lunch: { bg: '#FCF1D6', border: '#F3E0B0', title: '#8A6410', sub: '#B08A3A', bar: '#E0A82E' }, // 노랑
+  personal: { bg: '#EEEDEA', border: '#DEDCD6', title: '#4A4944', sub: '#7A7870', bar: '#8F8C82' }, // 스톤
+  offsite: { bg: '#FCE7E0', border: '#F4CFC3', title: '#A2452B', sub: '#C6765F', bar: '#E0704F' }, // 코랄
 };
 
-/** 이벤트별 표시 스타일 — 농도가 곧 종류다. 셋업의 종류 칩과 같은 어휘(KIND_STYLE 단일 소스). */
+/** 이벤트별 표시 스타일 — 색이 곧 종류다. 셋업의 종류 칩과 같은 어휘(KIND_STYLE 단일 소스). */
 export function styleFor(ev: CalendarEvent): KindStyle {
   return KIND_STYLE[ev.kind];
 }

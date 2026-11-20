@@ -70,11 +70,11 @@ const POP_SPRING = { type: 'spring' as const, stiffness: 500, damping: 18 };
  *  팔레트만 따뜻하게: 복숭아·버터가 위 코너(축하의 온도), 하늘·분홍이 아래 코너.
  *  중앙은 크림빛으로 가장 옅게 — 타이틀·버튼·카드의 가독 무대. */
 const DONE_BLOBS = [
-  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-[#E0E0E0] opacity-60',
-  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-[#EAEAEA] opacity-55',
-  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#D3D3D3] opacity-50',
-  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-[#DCDCDC] opacity-50',
-  'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-[#F4F4F4] opacity-50',
+  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-[#FADFD5] opacity-60',
+  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-[#FAEBC8] opacity-55',
+  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#D3EAF8] opacity-50',
+  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-[#F8DDE6] opacity-50',
+  'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-[#FBF3E6] opacity-50',
 ];
 
 export interface DoneStepProps {
@@ -101,7 +101,7 @@ export default function DoneStep({ state, dispatch }: DoneStepProps) {
         ))}
       </div>
 
-      {/* 데스크톱 헤더 — 여정 전체의 틀. 축하 무대(오로라 done)는 그대로 두고 워드마크만 얹는다. */}
+      {/* 데스크톱 헤더 — 여정 전체의 틀. 축하 무대는 그대로 두고 워드마크만 얹는다. */}
       <div className="absolute inset-x-0 top-0 z-10 hidden lg:block">
         <div className="mx-auto max-w-[1200px] px-6 py-4">
           <header className="flex h-10 items-center">
@@ -119,7 +119,7 @@ export default function DoneStep({ state, dispatch }: DoneStepProps) {
           initial={reduced ? false : { scale: 0 }}
           animate={{ scale: 1 }}
           transition={POP_SPRING}
-          className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-primary shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+          className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-primary shadow-[0_8px_24px_rgba(0,0,0,0.21)]"
         >
           <Check size={28} strokeWidth={3} aria-hidden className="text-white" />
         </motion.div>

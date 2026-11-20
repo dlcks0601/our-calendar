@@ -3,7 +3,6 @@
 import { Fragment, useMemo, useState, type Dispatch, type ReactNode } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Check, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Aurora } from '@/shared/ui/aurora';
 import { Avatar, type Attendee } from '@/entities/member';
 import { FrostedBar } from '@/shared/ui/frosted-bar';
 import { MobileSheet } from '@/shared/ui/mobile-sheet';
@@ -36,7 +35,7 @@ const WEEKDAY_SHORT = ['월', '화', '수', '목', '금', '토', '일'] as const
 
 /** 사람색 — 이 화면의 색은 종류가 아니라 사람이다("누가 언제 바쁜가").
  *  아바타 링과 타임라인 블록이 같은 색을 쓴다(자연 범례). 해시 배정 — 결정적. */
-const PERSON_PALETTE = ['#000000', '#3A3A3A', '#5E5E5E', '#808080', '#9E9E9E', '#1F1F1F', '#6F6F6F', '#B5B5B5'] as const;
+const PERSON_PALETTE = ['#3AA3DA', '#3DAE74', '#E0704F', '#E0A82E', '#8F8C82', '#C56B8E', '#7E9A3C', '#A9805C'] as const;
 function personColor(id: string): string {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
@@ -119,7 +118,7 @@ function WeekStrip({
                 onClick={() => onPick(day)}
                 className={`pressable relative mx-auto flex h-11 w-11 items-center justify-center rounded-[14px] text-[15px] font-semibold ${
                   selected
-                    ? 'bg-primary text-white shadow-[0_2px_10px_rgba(0,0,0,0.35)]'
+                    ? 'bg-primary text-white shadow-[0_2px_10px_rgba(0,0,0,0.21)]'
                     : tone === 'ok'
                       ? 'bg-primary-tint font-bold text-primary-pressed'
                       : tone === 'warn'
@@ -195,7 +194,7 @@ function AttendeeLine({ attendees, desktop }: { attendees: Attendee[]; desktop: 
               {a.attendanceType === 'required' && (
                 <span
                   aria-hidden
-                  className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#000000] text-[7px] font-black text-white ring-2 ring-white"
+                  className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#1F7A4B] text-[7px] font-black text-white ring-2 ring-white"
                 >
                   ✓
                 </span>
@@ -245,7 +244,7 @@ function SlotRow({
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
-      className="pressable flex w-full items-center gap-3 rounded-2xl px-1 py-3 text-left transition-colors hover:bg-section/50"
+      className="pressable -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-section/60"
     >
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-1.5">
@@ -270,7 +269,7 @@ const BADGE_REC = (
   <span className="shrink-0 rounded-lg bg-primary-tint px-2 py-1 text-[11px] font-bold text-primary">추천</span>
 );
 const BADGE_PARTIAL = (
-  <span className="shrink-0 rounded-lg bg-[#EEEEEE] px-2 py-1 text-[11px] font-bold text-[#000000]">부분</span>
+  <span className="shrink-0 rounded-lg bg-[#DDF0FB] px-2 py-1 text-[11px] font-bold text-[#136A99]">부분</span>
 );
 const BADGE_WARN = (
   <span className="shrink-0 rounded-lg bg-warn-bg px-2 py-1 text-[11px] font-bold text-warn-fg">아쉬움</span>
@@ -462,14 +461,14 @@ function OverlapTimeline({
             transition={reduced ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
             aria-label={`${fmtTime(g.start)} 후보 선택`}
             onClick={() => onPick(g)}
-            className="group/ghost absolute inset-x-0 z-[5] flex flex-col items-start justify-start rounded-[10px] border-[1.5px] border-dashed border-primary/45 bg-primary/[0.04] px-3.5 py-2 text-left transition-all duration-200 hover:z-20 hover:border-transparent hover:bg-primary hover:shadow-[0_4px_14px_rgba(0,0,0,0.35)]"
+            className="group/ghost absolute inset-x-0 z-[5] flex flex-col items-start justify-start rounded-[10px] border-[1.5px] border-dashed border-[#3AA3DA]/60 bg-[#3AA3DA]/[0.08] px-3.5 py-2 text-left transition-all duration-200 hover:z-20 hover:border-transparent hover:bg-primary hover:shadow-[0_4px_14px_rgba(0,0,0,0.21)]"
             style={{ top: y(g.start) + 2, height: Math.max(y(g.end) - y(g.start) - 5, 20) }}
           >
             {/* 솔리드 카드와 같은 순서 — 제목 먼저, 시간 아래. */}
-            <span className="block truncate text-[13px] font-bold text-primary/80 transition-colors group-hover/ghost:text-white">
+            <span className="block truncate text-[13px] font-bold text-[#136A99] transition-colors group-hover/ghost:text-white">
               {meetingTitle}
             </span>
-            <span className="block text-[11px] font-medium text-primary/60 transition-colors group-hover/ghost:text-white/85">
+            <span className="block text-[11px] font-medium text-[#4A93BD] transition-colors group-hover/ghost:text-white/85">
               {fmtTime(g.start)} – {fmtTime(g.end)}
             </span>
           </motion.button>
@@ -484,7 +483,7 @@ function OverlapTimeline({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={reduced ? { duration: 0 } : { duration: 0.22, ease: 'easeOut' }}
-            className="absolute inset-x-0 z-10 rounded-[10px] bg-primary px-3.5 py-2 text-white shadow-[0_4px_14px_rgba(0,0,0,0.35)]"
+            className="absolute inset-x-0 z-10 rounded-[10px] bg-primary px-3.5 py-2 text-white shadow-[0_4px_14px_rgba(0,0,0,0.21)]"
             style={{ top: y(slot.start) + 2, height: Math.max(y(slot.end) - y(slot.start) - 5, 20) }}
           >
             {/* 홈 카드와 같은 순서 — 제목이 먼저, 시간이 아래(단일 문법). */}
@@ -644,12 +643,8 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
 
   return (
     <div className="min-h-dvh bg-bg pb-32 lg:pb-12">
-      {/* 데스크톱 헤더 — 셋업·홈과 같은 오로라·워드마크 틀 */}
+      {/* 데스크톱 헤더 — 셋업·홈과 같은 워드마크 틀 */}
       <div className="relative hidden lg:block">
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <Aurora variant="home" />
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-white" />
-        </div>
         <div className="relative mx-auto max-w-[1200px] px-6 py-4">
           <header className="flex h-10 items-center">
             <Wordmark />
