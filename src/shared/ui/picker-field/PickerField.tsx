@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Check, ChevronDown } from 'lucide-react';
 import { MobileSheet, SheetCascade } from '@/shared/ui/mobile-sheet';
 import { useIsDesktop } from '@/shared/lib/hooks';
+import { SPRING } from '@/shared/tokens';
 
 /**
  * 커스텀 셀렉트 — 시스템 <select>를 대체하는 피커.
@@ -100,8 +101,8 @@ export default function PickerField({
         aria-selected={isSel}
         data-selected={isSel}
         onClick={() => select(o.value)}
-        className={`flex h-11 w-full shrink-0 items-center justify-between rounded-xl px-3.5 text-left text-[16px] transition-colors hover:bg-section lg:text-[15px] ${
-          isSel ? 'font-semibold text-primary' : 'font-medium text-text-strong'
+        className={`flex h-11 w-full shrink-0 items-center justify-between rounded-r4 px-3.5 text-left text-title-s transition-colors hover:bg-subtle lg:text-body-l ${
+          isSel ? 'font-semibold text-strong' : 'font-medium text-strong'
         }`}
       >
         {o.label}
@@ -119,13 +120,13 @@ export default function PickerField({
         aria-expanded={open}
         aria-label={ariaLabel}
         onClick={toggleOpen}
-        className="pressable flex h-[52px] w-full items-center justify-between rounded-2xl bg-section pl-4 pr-4 text-[16px] font-medium text-text-strong lg:text-[15px]"
+        className="pressable flex h-[52px] w-full items-center justify-between rounded-r5 bg-subtle pl-4 pr-4 text-title-s font-medium text-strong lg:text-body-l"
       >
         <span className="truncate">{current?.label ?? ''}</span>
         <ChevronDown
           size={16}
           aria-hidden
-          className={`shrink-0 text-text-weak transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`shrink-0 text-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -136,9 +137,9 @@ export default function PickerField({
             initial={{ opacity: 0, y: -6, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.98 }}
-            transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 30 }}
+            transition={reduced ? { duration: 0 } : SPRING.sheet}
             style={{ transformOrigin: 'top' }}
-            className="absolute inset-x-0 top-[calc(100%+6px)] z-40 overflow-hidden rounded-2xl bg-white p-1.5 shadow-[0_12px_40px_rgba(30,30,30,0.14),0_2px_8px_rgba(30,30,30,0.06)] ring-1 ring-border/60"
+            className="absolute inset-x-0 top-[calc(100%+6px)] z-40 overflow-hidden rounded-r5 bg-page p-1.5 shadow-s4 ring-1 ring-default/60"
           >
             <div
               ref={listRef}
@@ -168,12 +169,12 @@ export default function PickerField({
                   aria-pressed={isSel}
                   className="pressable flex min-h-[52px] w-full items-center justify-between py-2 text-left"
                 >
-                  <span className="text-[16px] font-medium text-text-strong">{o.label}</span>
+                  <span className="text-title-s font-medium text-strong">{o.label}</span>
                   <Check
                     size={22}
                     strokeWidth={3}
                     aria-hidden
-                    className={`shrink-0 ${isSel ? 'text-primary' : 'text-[#DADADA]'}`}
+                    className={`shrink-0 ${isSel ? 'text-strong' : 'text-disabled'}`}
                   />
                 </button>
               </SheetCascade>

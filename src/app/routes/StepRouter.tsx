@@ -140,7 +140,7 @@ export default function StepRouter() {
   };
 
   // 서버 렌더·첫 하이드레이션 프레임 — 날짜가 없는 빈 무대(위 가드 참조).
-  if (!mounted) return <main className="min-h-dvh bg-bg" />;
+  if (!mounted) return <main className="min-h-dvh bg-page" />;
 
   return (
     <>

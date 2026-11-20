@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Check, Mail, PartyPopper } from 'lucide-react';
 import type { AppNotification, NotificationKind } from '../model/types';
+import { SPRING } from '@/shared/tokens';
 
 /**
  * 토스트 스택 — 알림 스토어의 transient 큐(toasts)를 그린다. 수명(4초 자동 소멸)은
@@ -33,9 +34,9 @@ export function stackPose(depth: number, desktop: boolean): { y: number; scale: 
 
 /** kind → 아이콘·틴트 — 알림 센터(NotificationBell 패널)와 공유하는 단일 소스. */
 export const NOTIFICATION_KIND_STYLE: Record<NotificationKind, { Icon: typeof Check; wrap: string }> = {
-  response: { Icon: Check, wrap: 'bg-primary-tint text-primary' },
-  invite: { Icon: Mail, wrap: 'bg-section text-text-body' },
-  confirmed: { Icon: PartyPopper, wrap: 'bg-[#FCF1D6] text-[#8A6410]' },
+  response: { Icon: Check, wrap: 'bg-muted text-strong' },
+  invite: { Icon: Mail, wrap: 'bg-subtle text-default' },
+  confirmed: { Icon: PartyPopper, wrap: 'bg-warning-weak text-warning' },
 };
 
 /** lg(1024px) 기준 — 토스트는 마운트 이후에만 뜨므로 첫 페인트 불일치 걱정이 없다. */
@@ -86,15 +87,15 @@ export default function ToastStack({ toasts, onDismiss }: ToastStackProps) {
             initial={reduced ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduced ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.97 }}
-            transition={reduced ? { duration: 0.15 } : { type: 'spring', stiffness: 350, damping: 30 }}
+            transition={reduced ? { duration: 0.15 } : SPRING.position}
             onClick={() => onDismiss(toast.id)}
             className="cursor-pointer select-none"
           >
-            <div className="flex items-center gap-2.5 rounded-[14px] bg-[#1E1E1E]/[.92] px-4 py-3 shadow-[0_12px_32px_rgba(30,30,30,0.24)] backdrop-blur-[6px]">
-              <span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-primary text-white">
+            <div className="flex items-center gap-2.5 rounded-r4 bg-ink/[.92] px-4 py-3 shadow-s3 backdrop-blur-[6px]">
+              <span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-ink text-on-ink">
                 <Check size={12} strokeWidth={3} />
               </span>
-              <p className="min-w-0 text-[14px] font-semibold leading-[1.4] text-white">{toast.text}</p>
+              <p className="min-w-0 text-body font-semibold leading-snug text-on-ink">{toast.text}</p>
             </div>
           </motion.div>
         ))}
@@ -120,16 +121,16 @@ export default function ToastStack({ toasts, onDismiss }: ToastStackProps) {
               initial={reduced ? { opacity: 0 } : { opacity: 0, y: enterY, scale: 1 }}
               animate={pose}
               exit={reduced ? { opacity: 0 } : { opacity: 0, y: enterY, scale: pose.scale }}
-              transition={reduced ? { duration: 0.15 } : { type: 'spring', stiffness: 350, damping: 30 }}
+              transition={reduced ? { duration: 0.15 } : SPRING.position}
               style={{ zIndex: count - depth, transformOrigin: desktop ? 'bottom center' : 'top center' }}
               onClick={() => onDismiss(toast.id)}
               className={`absolute w-full cursor-pointer select-none ${desktop ? 'bottom-0 right-0' : 'inset-x-0 top-0'}`}
             >
-              <div className="flex items-center gap-3 rounded-card bg-white py-3.5 pl-3.5 pr-5 shadow-[0_12px_32px_rgba(30,30,30,0.12),0_2px_8px_rgba(30,30,30,0.06)] ring-1 ring-border/60">
+              <div className="flex items-center gap-3 rounded-r5 bg-page py-3.5 pl-3.5 pr-5 shadow-s4 ring-1 ring-default/60">
                 <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${wrap}`} aria-hidden>
                   <Icon size={15} strokeWidth={2.4} />
                 </span>
-                <p className="min-w-0 text-[14px] font-medium leading-[1.45] text-text-strong">{toast.text}</p>
+                <p className="min-w-0 text-body font-medium leading-snug text-strong">{toast.text}</p>
               </div>
             </motion.div>
           );

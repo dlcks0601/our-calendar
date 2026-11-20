@@ -18,7 +18,7 @@ const overusedGrotesk = localFont({
 export function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="ko" className={overusedGrotesk.variable}>
-      <body className="bg-bg text-text-strong antialiased">{children}</body>
+      <body className="bg-page text-strong antialiased">{children}</body>
     </html>
   );
 }

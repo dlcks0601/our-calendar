@@ -25,7 +25,7 @@ export default function FrostedBar({
       <div
         aria-hidden
         style={{ opacity: p }}
-        className="pointer-events-none absolute inset-x-0 -bottom-12 top-0 bg-white/60 backdrop-blur-lg [mask-image:linear-gradient(to_bottom,black_40%,transparent)]"
+        className="pointer-events-none absolute inset-x-0 -bottom-12 top-0 bg-page/60 backdrop-blur-lg [mask-image:linear-gradient(to_bottom,black_40%,transparent)]"
       />
       <div className={`relative ${innerClassName}`}>{children}</div>
     </div>

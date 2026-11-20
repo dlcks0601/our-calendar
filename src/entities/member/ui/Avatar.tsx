@@ -220,10 +220,10 @@ export interface AvatarProps {
 }
 
 const SIZE_CLASS: Record<AvatarSize, string> = {
-  24: 'h-6 w-6 text-[10px]',
-  28: 'h-7 w-7 text-[11px]',
-  32: 'h-8 w-8 text-[12px]',
-  40: 'h-10 w-10 text-[14px]',
+  24: 'h-6 w-6 text-caption-s',
+  28: 'h-7 w-7 text-caption',
+  32: 'h-8 w-8 text-label',
+  40: 'h-10 w-10 text-body',
 };
 
 export default function Avatar({ person, faceId, name, size = 40, onClick }: AvatarProps) {

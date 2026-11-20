@@ -7,7 +7,7 @@ describe('renderThemeCss — 명세를 Tailwind 테마 CSS로', () => {
 
   it('@theme 블록 하나로 시작한다', () => {
     expect(css.startsWith('/* 생성물')).toBe(true);
-    expect(css.match(/@theme \{/g)).toHaveLength(1);
+    expect(css.match(/@theme static \{/g)).toHaveLength(1);
   });
 
   it('역할 색을 유틸리티별 이름공간으로 낸다', () => {
@@ -31,6 +31,11 @@ describe('renderThemeCss — 명세를 Tailwind 테마 CSS로', () => {
   it('모서리와 그림자 단계를 낸다', () => {
     expect(css).toContain('--radius-r5: 16px;');
     expect(css).toContain('--shadow-s1: 0 1px 3px rgb(0 0 0 / 0.06);');
+  });
+
+  it('Tailwind 기본 색·모서리·그림자·글자 단계를 지운다 — 명세에 있는 값만 클래스가 된다', () => {
+    for (const namespace of ['color', 'radius', 'shadow', 'text', 'leading', 'tracking'])
+      expect(css).toContain(`--${namespace}-*: initial;`);
   });
 
   it('같은 명세에서는 항상 같은 결과가 나온다', () => {
