@@ -15,8 +15,8 @@
   --color-text-weak: #8c8c8c;
   --color-text-faint: #b8b8b8;
   --color-error: #e5342b;
-  --color-warn-fg: #9a5b00;
-  --color-warn-bg: #fff4dc;
+  --color-warn-fg: #6f5a2e;
+  --color-warn-bg: #f3eee2;
   /* 새 알림이 도착했다는 신호. */
   --color-alert: #f03e3e;
   --radius-card: 16px;
@@ -89,11 +89,11 @@ button:not(:disabled),
 }
 
 /* ── 완료 화면 타이틀 1곳만. clip-text + sheen.
-   DOM 텍스트 유지(접근성) — 보라에서 로즈로 흐른다. 명도는 두 단계 안에서만 논다. ── */
+   DOM 텍스트 유지(접근성) — 검정 글자 위로 옅은 빛이 한 번씩 지나간다. ── */
 .iridescent {
   background-image: linear-gradient(
     100deg,
-    #6b2fd0 0%, #a23bb5 26%, #c93458 38%, #a23bb5 50%, #6b2fd0 64%, #a23bb5 82%, #6b2fd0 100%
+    #000000 0%, #000000 30%, #6b6b6b 42%, #000000 54%, #000000 100%
   );
   background-size: 250% 100%;
   background-clip: text;
@@ -126,9 +126,9 @@ button:not(:disabled),
   to { transform: scale(1.1); opacity: 1; }
 }
 
-/* 시머 — 검정 글자 위로 보라 밴드가 지나간다. 명도 차는 두 단계로 억제. */
+/* 시머 — 검정 글자 위로 회색 밴드가 지나간다. 명도 차는 두 단계로 억제. */
 .scan-title-sheen {
-  background-image: linear-gradient(90deg, #1a1a1a 25%, #4b2aa8 42%, #7a3fe0 50%, #4b2aa8 58%, #1a1a1a 75%);
+  background-image: linear-gradient(90deg, #000000 25%, #3d3d3d 42%, #6e6e6e 50%, #3d3d3d 58%, #000000 75%);
   background-size: 250% 100%;
   background-clip: text;
   -webkit-background-clip: text;
