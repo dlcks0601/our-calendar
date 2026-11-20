@@ -15,8 +15,8 @@
   --color-text-weak: #8c8c8c;
   --color-text-faint: #b8b8b8;
   --color-error: #e5342b;
-  --color-warn-fg: #6f5a2e;
-  --color-warn-bg: #f3eee2;
+  --color-warn-fg: #8a6410;
+  --color-warn-bg: #fcf1d6;
   /* 새 알림이 도착했다는 신호. */
   --color-alert: #f03e3e;
   --radius-card: 16px;

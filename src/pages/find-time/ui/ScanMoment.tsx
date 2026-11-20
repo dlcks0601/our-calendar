@@ -33,10 +33,10 @@ export interface ScanMomentProps {
  *  각 색이 코너 하나씩을 소유하고 이음새에서만 섞인다 — 전부 겹치면 색이 죽는다(머디 워시 금지).
  *  가운데는 가장 밝게 남아 검정 헤드라인의 자리가 된다. */
 const BLOBS = [
-  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-[#DCE8F1] opacity-60',
-  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-[#E0E9DE] opacity-55',
-  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#EDDDD6] opacity-55',
-  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-[#EFE7D6] opacity-55',
+  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-[#D3EAF8] opacity-60',
+  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-[#D8F0E0] opacity-55',
+  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#FADFD5] opacity-55',
+  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-[#FAEBC8] opacity-55',
   // 가운데 — 코너 색들의 다리(연한 페리윙클). 헤드라인 가독을 지키는 가장 옅은 톤.
   'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-[#E9E9E6] opacity-45',
 ];

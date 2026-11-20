@@ -70,11 +70,11 @@ const POP_SPRING = { type: 'spring' as const, stiffness: 500, damping: 18 };
  *  팔레트만 따뜻하게: 복숭아·버터가 위 코너(축하의 온도), 하늘·분홍이 아래 코너.
  *  중앙은 크림빛으로 가장 옅게 — 타이틀·버튼·카드의 가독 무대. */
 const DONE_BLOBS = [
-  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-[#EDDDD6] opacity-60',
-  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-[#EFE7D6] opacity-55',
-  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#DCE8F1] opacity-50',
-  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-[#EDDFE4] opacity-50',
-  'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-[#F1EEE8] opacity-50',
+  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-[#FADFD5] opacity-60',
+  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-[#FAEBC8] opacity-55',
+  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#D3EAF8] opacity-50',
+  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-[#F8DDE6] opacity-50',
+  'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-[#FBF3E6] opacity-50',
 ];
 
 export interface DoneStepProps {
