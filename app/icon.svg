@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34">
-  <style>.m{fill:#000}@media (prefers-color-scheme:dark){.m{fill:#fff}}</style>
-  <g class="m" transform="translate(0 9)">
-    <circle cx="8" cy="8" r="7.25"/>
-    <circle cx="30.46" cy="11.15" r="0.95"/><circle cx="28.15" cy="13.46" r="0.95"/><circle cx="25.0" cy="14.3" r="0.95"/><circle cx="21.85" cy="13.46" r="0.95"/><circle cx="19.54" cy="11.15" r="0.95"/><circle cx="18.7" cy="8.0" r="0.95"/><circle cx="19.54" cy="4.85" r="0.95"/><circle cx="21.85" cy="2.54" r="0.95"/><circle cx="25.0" cy="1.7" r="0.95"/><circle cx="28.15" cy="2.54" r="0.95"/><circle cx="30.46" cy="4.85" r="0.95"/>
-  </g>
-</svg>
