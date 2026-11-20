@@ -2,6 +2,8 @@
 
 > 알아서 맞춰주는 캘린더. 혼자일 때는 내 캘린더이고, 참석자를 더하는 순간 우리의 캘린더가 됩니다.
 
+**[라이브 데모 · our-calendar-three-blush.vercel.app](https://our-calendar-three-blush.vercel.app)**
+
 <p>
   <img src="docs/readme/home-pc.png" width="100%" alt="홈. 월요일부터 금요일까지의 주간 캘린더" />
 </p>
@@ -13,6 +15,8 @@
 - **참석자를 더하면 우리의 캘린더입니다.** 참석자들의 일정을 읽고 좋은 시간을 순서대로 추천합니다.
 - **추천에는 이유가 붙습니다.** "필수 2명 모두 편하게 참석할 수 있어요"처럼 사람과 근거를 함께 보여 줍니다.
 - **PC와 모바일을 모두 대응합니다.** 날짜는 언제 열어도 오늘 기준으로 움직입니다.
+
+로컬에서 실행하려면 다음과 같이 합니다.
 
 ```bash
 npm install
@@ -110,16 +114,15 @@ npm run dev        # http://localhost:3000
 </p>
 
 참석자와 조건이 주소에 담겨 있어 어떤 장면이든 그대로 다시 열 수 있습니다.
-아래 주소를 `http://localhost:3000` 뒤에 붙입니다.
 
-| 장면 | 주소 |
+| 장면 | 바로 가기 |
 | --- | --- |
-| 혼자면 바로 캘린더에 | `/?p=ichan.r&d=60&dl=nw&s=setup` |
-| 6명(꼭 참석 4, 선택 2), 1시간, 다음 주까지 | `/?p=ichan.r,junho.r,seoyeon.r,minsu.r,haneul.o,sehun.o&d=60&dl=nw&s=setup` |
-| 모두 가능한 시간이 있는 날 | `/?p=ichan.r,junho.o,seoyeon.r&d=60&dl=nw&s=find` |
-| 전부 조금씩 아쉬운 날, "그나마 나은 순" | `/?p=ichan.r,junho.r,seoyeon.r,sehun.r,jiwoo.r,daon.r&d=60&dl=nw&s=find` |
-| 모두가 편한 시간이 없는 날, 다음 수 제안 | `/?p=ichan.r,junho.r,seoyeon.r,sehun.r,jiwoo.r,daon.r&d=60&dl=tw&s=find` |
-| 초대를 받는 입장 | `/?s=invite` |
+| 혼자면 바로 캘린더에 | [일정 만들기](https://our-calendar-three-blush.vercel.app/?p=ichan.r&d=60&dl=nw&s=setup) |
+| 6명(꼭 참석 4, 선택 2), 1시간, 다음 주까지 | [일정 만들기](https://our-calendar-three-blush.vercel.app/?p=ichan.r,junho.r,seoyeon.r,minsu.r,haneul.o,sehun.o&d=60&dl=nw&s=setup) |
+| 모두 가능한 시간이 있는 날 | [시간 찾기](https://our-calendar-three-blush.vercel.app/?p=ichan.r,junho.o,seoyeon.r&d=60&dl=nw&s=find) |
+| 전부 조금씩 아쉬운 날, "그나마 나은 순" | [시간 찾기](https://our-calendar-three-blush.vercel.app/?p=ichan.r,junho.r,seoyeon.r,sehun.r,jiwoo.r,daon.r&d=60&dl=nw&s=find) |
+| 모두가 편한 시간이 없는 날, 다음 수 제안 | [시간 찾기](https://our-calendar-three-blush.vercel.app/?p=ichan.r,junho.r,seoyeon.r,sehun.r,jiwoo.r,daon.r&d=60&dl=tw&s=find) |
+| 초대를 받는 입장 | [초대 열기](https://our-calendar-three-blush.vercel.app/?s=invite) |
 
 ## 추천이 만들어지는 방식
 
