@@ -32,7 +32,7 @@ export interface FaceConfig {
  */
 export const AVATAR_PALETTE = [
   { bg: '#E7EEE6', text: '#3F5A42' }, // 세이지
-  { bg: '#ECE8F0', text: '#54456A' }, // 플럼
+  { bg: '#E4EEF5', text: '#2C5A78' }, // 하늘
   { bg: '#EDEEE2', text: '#585D30' }, // 올리브
   { bg: '#F3EEE2', text: '#6F5A2E' }, // 샌드
   { bg: '#F3E8E4', text: '#7A4636' }, // 클레이

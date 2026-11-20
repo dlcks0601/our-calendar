@@ -35,7 +35,7 @@ const WEEKDAY_SHORT = ['월', '화', '수', '목', '금', '토', '일'] as const
 
 /** 사람색 — 이 화면의 색은 종류가 아니라 사람이다("누가 언제 바쁜가").
  *  아바타 링과 타임라인 블록이 같은 색을 쓴다(자연 범례). 해시 배정 — 결정적. */
-const PERSON_PALETTE = ['#6F5C8A', '#5E7D61', '#A8604B', '#A58A4C', '#8A8A84', '#8C6A7A', '#6B6F4A', '#9A7B62'] as const;
+const PERSON_PALETTE = ['#5B8FB3', '#5E7D61', '#A8604B', '#A58A4C', '#8A8A84', '#8C6A7A', '#6B6F4A', '#9A7B62'] as const;
 function personColor(id: string): string {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
@@ -269,7 +269,7 @@ const BADGE_REC = (
   <span className="shrink-0 rounded-lg bg-primary-tint px-2 py-1 text-[11px] font-bold text-primary">추천</span>
 );
 const BADGE_PARTIAL = (
-  <span className="shrink-0 rounded-lg bg-[#ECE8F0] px-2 py-1 text-[11px] font-bold text-[#54456A]">부분</span>
+  <span className="shrink-0 rounded-lg bg-[#E4EEF5] px-2 py-1 text-[11px] font-bold text-[#2C5A78]">부분</span>
 );
 const BADGE_WARN = (
   <span className="shrink-0 rounded-lg bg-warn-bg px-2 py-1 text-[11px] font-bold text-warn-fg">아쉬움</span>
@@ -461,14 +461,14 @@ function OverlapTimeline({
             transition={reduced ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
             aria-label={`${fmtTime(g.start)} 후보 선택`}
             onClick={() => onPick(g)}
-            className="group/ghost absolute inset-x-0 z-[5] flex flex-col items-start justify-start rounded-[10px] border-[1.5px] border-dashed border-[#6F5C8A]/50 bg-[#6F5C8A]/[0.06] px-3.5 py-2 text-left transition-all duration-200 hover:z-20 hover:border-transparent hover:bg-primary hover:shadow-[0_4px_14px_rgba(0,0,0,0.21)]"
+            className="group/ghost absolute inset-x-0 z-[5] flex flex-col items-start justify-start rounded-[10px] border-[1.5px] border-dashed border-[#5B8FB3]/55 bg-[#5B8FB3]/[0.07] px-3.5 py-2 text-left transition-all duration-200 hover:z-20 hover:border-transparent hover:bg-primary hover:shadow-[0_4px_14px_rgba(0,0,0,0.21)]"
             style={{ top: y(g.start) + 2, height: Math.max(y(g.end) - y(g.start) - 5, 20) }}
           >
             {/* 솔리드 카드와 같은 순서 — 제목 먼저, 시간 아래. */}
-            <span className="block truncate text-[13px] font-bold text-[#54456A] transition-colors group-hover/ghost:text-white">
+            <span className="block truncate text-[13px] font-bold text-[#2C5A78] transition-colors group-hover/ghost:text-white">
               {meetingTitle}
             </span>
-            <span className="block text-[11px] font-medium text-[#7C6E90] transition-colors group-hover/ghost:text-white/85">
+            <span className="block text-[11px] font-medium text-[#5F87A3] transition-colors group-hover/ghost:text-white/85">
               {fmtTime(g.start)} – {fmtTime(g.end)}
             </span>
           </motion.button>

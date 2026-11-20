@@ -5,7 +5,7 @@ export function eventsOn(events: readonly CalendarEvent[], day: string): Calenda
   return events.filter((e) => e.day === day).sort((a, b) => a.start - b.start);
 }
 
-// ── 이벤트 종류별 틴트 — 색이 곧 종류다. 검정·흰색과 어울리게 채도를 낮췄고 파란 계열은 쓰지 않는다 ──
+// ── 이벤트 종류별 틴트 — 색이 곧 종류다. 검정·흰색과 어울리게 채도를 낮췄다. 하늘색은 옅고 회색빛 도는 톤만 쓴다 ──
 // (ProfilePeek 미니 캘린더가 같은 팔레트를 공유한다 — 단일 소스)
 
 export interface KindStyle {
@@ -19,7 +19,7 @@ export interface KindStyle {
 
 export const KIND_STYLE: Record<EventKind, KindStyle> = {
   // 옅은 바탕 + 같은 계열의 짙은 글자. 제목은 바탕 대비 4.5:1 이상을 지킨다.
-  meeting: { bg: '#ECE8F0', border: '#DCD5E3', title: '#54456A', sub: '#7C6E90', bar: '#6F5C8A' }, // 플럼
+  meeting: { bg: '#E4EEF5', border: '#D0E0EC', title: '#2C5A78', sub: '#5F87A3', bar: '#5B8FB3' }, // 하늘
   focus: { bg: '#E7EEE6', border: '#D3DED1', title: '#3F5A42', sub: '#69826B', bar: '#5E7D61' }, // 세이지
   lunch: { bg: '#F3EEE2', border: '#E5DCC8', title: '#6F5A2E', sub: '#93805A', bar: '#A58A4C' }, // 샌드
   personal: { bg: '#ECECEA', border: '#DCDCD8', title: '#4A4A46', sub: '#777772', bar: '#8A8A84' }, // 스톤
