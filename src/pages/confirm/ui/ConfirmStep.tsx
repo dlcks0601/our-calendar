@@ -3,7 +3,6 @@
 import type { Dispatch } from 'react';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'motion/react';
 import { Check, ChevronLeft, Video } from 'lucide-react';
-import { Aurora } from '@/shared/ui/aurora';
 import { Avatar } from '@/entities/member';
 import { FrostedBar } from '@/shared/ui/frosted-bar';
 import { Badge } from '@/shared/ui/badge';
@@ -172,12 +171,8 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
 
   return (
     <main className="min-h-dvh bg-bg pb-44">
-      {/* 데스크톱 헤더 — 홈·셋업·찾기와 같은 오로라·워드마크 틀(스텝이 바뀌어도 유지). */}
+      {/* 데스크톱 헤더 — 홈·셋업·찾기와 같은 워드마크 틀(스텝이 바뀌어도 유지). */}
       <div className="relative hidden lg:block">
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <Aurora variant="home" />
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-white" />
-        </div>
         <div className="relative mx-auto max-w-[1200px] px-6 py-4">
           <header className="flex h-10 items-center">
             <Wordmark />

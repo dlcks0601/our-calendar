@@ -101,7 +101,7 @@ export default function DoneStep({ state, dispatch }: DoneStepProps) {
         ))}
       </div>
 
-      {/* 데스크톱 헤더 — 여정 전체의 틀. 축하 무대(오로라 done)는 그대로 두고 워드마크만 얹는다. */}
+      {/* 데스크톱 헤더 — 여정 전체의 틀. 축하 무대는 그대로 두고 워드마크만 얹는다. */}
       <div className="absolute inset-x-0 top-0 z-10 hidden lg:block">
         <div className="mx-auto max-w-[1200px] px-6 py-4">
           <header className="flex h-10 items-center">
