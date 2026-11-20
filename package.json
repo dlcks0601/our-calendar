@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "lint:fsd": "steiger ./src",
     "visual:capture": "node scripts/visual/capture.mjs",
-    "visual:compare": "node scripts/visual/compare.mjs"
+    "visual:compare": "node scripts/visual/compare.mjs",
+    "tokens:generate": "node scripts/generate-tokens.ts"
   },
   "dependencies": {
     "lucide-react": "^1.23.0",
