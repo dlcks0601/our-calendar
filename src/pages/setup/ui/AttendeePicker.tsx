@@ -6,6 +6,9 @@ import { Check, ChevronDown, Search, X } from 'lucide-react';
 import { Avatar, ME_ID, ORG, type Person } from '@/entities/member';
 import ProfilePeek from './ProfilePeek';
 import { useIsDesktop } from '@/shared/lib/hooks';
+import { SPRING } from '@/shared/tokens';
+import { ActionButton } from '@/shared/ui/action-button';
+import { IconButton } from '@/shared/ui/icon-button';
 
 /**
  * 참석자 피커 — 모바일 바텀시트 / 데스크톱 중앙 모달(max-w 480).
@@ -117,13 +120,13 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
           initial: { opacity: 0, scale: reduced ? 1 : 0.96, y: reduced ? 0 : 12 },
           animate: { opacity: 1, scale: 1, y: 0 },
           exit: { opacity: 0, scale: reduced ? 1 : 0.96, y: reduced ? 0 : 12 },
-          transition: reduced ? { duration: 0 } : { type: 'spring' as const, stiffness: 350, damping: 30 },
+          transition: reduced ? { duration: 0 } : SPRING.position,
         }
       : {
           initial: { y: '100%' },
           animate: { y: 0 },
           exit: { y: '100%' },
-          transition: { type: 'spring' as const, stiffness: 350, damping: 34 },
+          transition: SPRING.position,
         };
 
   return (
@@ -136,7 +139,7 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
         transition={fade}
         onClick={onClose}
         aria-hidden
-        className="absolute inset-0 bg-[#1E1E1E]/45"
+        className="absolute inset-0 bg-ink/45"
       />
 
       <motion.div
@@ -153,11 +156,11 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
         onDragEnd={(_, info) => {
           if (info.offset.y > 100 || info.velocity.y > 600) onClose();
         }}
-        className="relative flex h-[78dvh] w-full flex-col overflow-hidden rounded-t-[24px] bg-white lg:h-auto lg:max-h-[min(640px,85dvh)] lg:w-[480px] lg:rounded-[24px]"
+        className="relative flex h-[78dvh] w-full flex-col overflow-hidden rounded-t-r6 bg-page lg:h-auto lg:max-h-[min(640px,85dvh)] lg:w-[480px] lg:rounded-r6"
       >
         {/* 그랩바(모바일) — 아래로 스와이프하면 시트가 닫힌다 */}
         <div aria-hidden className="touch-none pt-2.5 lg:hidden" onPointerDown={startDrag}>
-          <div className="mx-auto h-1 w-9 rounded-full bg-border" />
+          <div className="mx-auto h-1 w-9 rounded-full bg-muted" />
         </div>
 
         {/* 헤더 — 모바일에선 여기서도 끌어서 닫을 수 있다. X는 데스크톱 전용. */}
@@ -165,12 +168,12 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
           className="flex touch-none items-center justify-between px-5 pb-1 pt-5 lg:touch-auto"
           onPointerDown={startDrag}
         >
-          <h2 className="text-[18px] font-bold tracking-[-0.01em] text-text-strong">함께할 사람을 선택해주세요</h2>
+          <h2 className="text-title font-bold tracking-snug text-strong">함께할 사람을 선택해주세요</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="닫기"
-            className="pressable -mr-2 hidden h-9 w-9 items-center justify-center rounded-full text-text-weak hover:bg-section lg:flex"
+            className="pressable -mr-2 hidden h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-subtle lg:flex"
           >
             <X size={19} aria-hidden />
           </button>
@@ -178,14 +181,14 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
 
         {/* 검색 */}
         <div className="px-5 pb-2 pt-2">
-          <div className="flex h-11 items-center gap-2.5 rounded-xl bg-section px-3.5">
-            <Search size={16} className="shrink-0 text-text-weak" aria-hidden />
+          <div className="flex h-11 items-center gap-2.5 rounded-r4 bg-subtle px-3.5">
+            <Search size={16} className="shrink-0 text-muted" aria-hidden />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="이름이나 역할로 검색"
               aria-label="참석자 검색"
-              className="h-full w-full bg-transparent text-[16px] text-text-strong outline-none placeholder:text-text-faint lg:text-[15px]"
+              className="h-full w-full bg-transparent text-title-s text-strong outline-none placeholder:text-faint lg:text-body-l"
             />
           </div>
         </div>
@@ -193,13 +196,13 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
         {/* 20명 리스트 — 마지막 행이 frost 아래를 빠져나올 수 있게 하단 여백을 준다. */}
         <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-1 lg:h-[380px] lg:flex-none">
           {filtered.length === 0 && (
-            <p className="py-12 text-center text-[13px] text-text-faint">검색 결과가 없어요</p>
+            <p className="py-12 text-center text-body-s text-faint">검색 결과가 없어요</p>
           )}
           {filtered.map((p) => {
             const isMe = p.id === ME_ID;
             const selected = selectedSet.has(p.id);
             return (
-              <div key={p.id} data-attendee-row className="rounded-xl px-2 transition-colors hover:bg-section/60">
+              <div key={p.id} data-attendee-row className="rounded-r4 px-2 transition-colors hover:bg-subtle/60">
                 <div className="flex items-center gap-3 py-1.5">
                   <Avatar person={p} size={28} />
                   <button
@@ -216,11 +219,11 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
                     className="flex min-w-0 flex-1 items-center gap-3 py-1.5 text-left disabled:cursor-default"
                   >
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[15px] font-medium text-text-strong">
+                      <span className="block truncate text-body-l font-medium text-strong">
                         {p.name}
-                        {isMe && <span className="ml-1.5 text-[12px] font-normal text-text-weak">나 · 주최자</span>}
+                        {isMe && <span className="ml-1.5 text-label font-normal text-muted">나 · 주최자</span>}
                       </span>
-                      <span className="block truncate text-[12px] text-text-weak">{p.role}</span>
+                      <span className="block truncate text-label text-muted">{p.role}</span>
                     </span>
                     {/* 맨 체크 — 앱 공통 선택 어휘(선택 검정 / 미선택 연회색, 주최자는 옅은 파랑 고정). */}
                     <Check
@@ -228,14 +231,13 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
                       strokeWidth={3}
                       aria-hidden
                       className={`shrink-0 transition-colors ${
-                        selected ? (isMe ? 'text-primary/35' : 'text-primary') : 'text-[#DADADA]'
+                        selected ? (isMe ? 'text-strong/35' : 'text-strong') : 'text-disabled'
                       }`}
                     />
                   </button>
                   {/* 일정 펼침 — 보이는 어포던스. 아바타 숨은 탭을 대체한다.
                       펼치면 행+피크가 화면에 들어오도록 리스트 스크롤이 따라간다. */}
-                  <button
-                    type="button"
+                  <IconButton size="xs" tone="faint"
                     aria-expanded={peekId === p.id}
                     aria-label={`${p.name} 일정 보기`}
                     /* 펼치면 그 사람이 리스트 맨 위로 도킹 — 목표가 고정이라 피크 높이와
@@ -249,14 +251,14 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
                           ?.scrollIntoView({ block: 'start', behavior: 'smooth' });
                       }
                     }}
-                    className="pressable flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-text-faint transition-colors hover:bg-section hover:text-text-weak"
+                    className="hover:text-muted"
                   >
                     <ChevronDown
                       size={16}
                       aria-hidden
                       className={`transition-transform duration-200 ${peekId === p.id ? 'rotate-180' : ''}`}
                     />
-                  </button>
+                  </IconButton>
                 </div>
                 {/* 피크 안 별도 '선택하기'는 두지 않는다 — 도킹 덕에 행의 체크 원이 항상 보이므로
                     원을 누르는 것이 곧 선택이고, 선택하면 피크가 접힌다(중복 UI 제거). */}
@@ -272,16 +274,15 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
         <div className="relative -mt-9 px-5 pb-[max(16px,env(safe-area-inset-bottom))] pt-3.5 lg:pb-5">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 -top-10 bottom-0 bg-gradient-to-t from-white via-white/85 to-transparent"
+            className="pointer-events-none absolute inset-x-0 -top-10 bottom-0 bg-gradient-to-t from-gray-0 via-gray-0/85 to-transparent"
           />
-          <button
-            type="button"
+          <ActionButton size="lg" fullWidth
             disabled={confirm.disabled}
             onClick={onClose}
-            className="pressable relative h-[54px] w-full rounded-2xl bg-primary text-[16px] font-semibold text-white active:bg-primary-pressed disabled:bg-section disabled:text-text-faint"
+            className="relative"
           >
             {confirm.label}
-          </button>
+          </ActionButton>
         </div>
       </motion.div>
     </div>
