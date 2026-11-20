@@ -1,0 +1,886 @@
+'use client';
+
+import { Fragment, useMemo, useState, type Dispatch, type ReactNode } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { Check, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Aurora } from '@/shared/ui/aurora';
+import { Avatar, type Attendee } from '@/entities/member';
+import { FrostedBar } from '@/shared/ui/frosted-bar';
+import { MobileSheet } from '@/shared/ui/mobile-sheet';
+import { Reveal } from '@/shared/ui/reveal';
+import { Wordmark } from '@/shared/ui/wordmark';
+import { decisionKey, pickAction, DEADLINE_LABEL, DURATION_LABEL, WINDOW_LABEL, josa, type Candidates, type Action, type AppState, type RelaxationSuggestion } from '@/features/schedule-meeting';
+import { addDaysISO, fmtDayKorean, fmtTime, weekMondays } from '@/shared/lib/time';
+import { ANCHOR_DATE } from '@/shared/config';
+import { useIsDesktop } from '@/shared/lib/hooks';
+import type { CandidateSlot } from '@/entities/slot';
+import type { EventKind } from '@/entities/event';
+
+/**
+ * 시간 정하기 — 한 칼럼의 층위(헤드라인 → 달력 → 참석자 → 추천 → 확정)를
+ * PC에선 반반(좌 달력·참석자 / 우 추천·타임라인·CTA)으로 펼친다. 모바일·PC 단일 구현.
+ *
+ * 분석 Q1~Q10의 판정이 이 파일의 법이다:
+ *  - 헤드라인 = 상태 선언(모두 가능/전부 아쉬움/없음/부분이면 돼요/이 시간뿐).
+ *  - 추천순은 기한 창 전체의 상위(같은 날 최대 2 — 날짜 다양성 보정), 달력은 날짜 필터 손잡이.
+ *  - 아쉬운 후보는 좋은 답이 있으면 '더 보기' 뒤로, 전부 아쉬울 때만 본문에.
+ *  - 후보 0이면 달력 소멸 — 결정 제안(완화 4종)이 무대가 되고, 고르면 조건이 바뀌며 리빌.
+ *  - 조건 수정 UI 없음 — 제안과 뒤로가기만 조건을 바꾼다. '한 번만' 규칙(decisionKey) 유지.
+ *  - 겹침 타임라인(선택된 날의 팀 캘린더)은 PC 상시·모바일 접힘 — 추천을 바꾸면
+ *    검은 카드가 그 빈틈으로 스프링 이동(엔진이 사정을 읽었다는 그림 증명).
+ */
+
+// ── 표시 상수 ──────────────────────────────────────────────────────
+
+const WEEKDAY_SHORT = ['월', '화', '수', '목', '금', '토', '일'] as const;
+
+/** 사람색 — 이 화면의 색은 종류가 아니라 사람이다("누가 언제 바쁜가").
+ *  아바타 링과 타임라인 블록이 같은 색을 쓴다(자연 범례). 해시 배정 — 결정적. */
+const PERSON_PALETTE = ['#000000', '#3A3A3A', '#5E5E5E', '#808080', '#9E9E9E', '#1F1F1F', '#6F6F6F', '#B5B5B5'] as const;
+function personColor(id: string): string {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return PERSON_PALETTE[Math.abs(h) % PERSON_PALETTE.length];
+}
+/** 병합 점심(여러 사람 공동) — 누구의 색도 아니라 중립 회색. */
+const MERGED_COLOR = '#A4A4A4';
+
+/** 날짜 화법 — 가까운 날은 상대 표현(오늘·내일), 그 밖은 '7월 13일 (월)' 풀 포맷. */
+function fmtDayLabel(iso: string): string {
+  const diff = Math.round((Date.parse(iso) - Date.parse(ANCHOR_DATE)) / 86400000);
+  if (diff === 0) return '오늘';
+  if (diff === 1) return '내일';
+  return fmtDayKorean(iso);
+}
+
+// ── 표시 셀렉션(순수) ──────────────────────────────────────────────
+
+/**
+ * 추천 상위 고르기 — Q6·Q7: 4개 이하면 전부, 그 이상이면 상위 3개(같은 날 최대 2).
+ * 엔진 순위는 불변 — 표시 레벨의 날짜 다양성 보정만 한다.
+ */
+export function pickRecommended(list: CandidateSlot[]): CandidateSlot[] {
+  if (list.length <= 4) return list;
+  const out: CandidateSlot[] = [];
+  const perDay = new Map<string, number>();
+  for (const s of list) {
+    const count = perDay.get(s.day) ?? 0;
+    if (count >= 2) continue;
+    out.push(s);
+    perDay.set(s.day, count + 1);
+    if (out.length === 3) break;
+  }
+  return out;
+}
+
+/** 카드 서브라인 — 차이 나는 사정 한 줄(없으면 positive 요약). */
+function cardReason(slot: CandidateSlot): string {
+  const nonPositive = slot.reasons.find((r) => r.tone !== 'positive');
+  return (nonPositive ?? slot.reasons[0])?.text ?? '';
+}
+
+// ── 조각들 ─────────────────────────────────────────────────────────
+
+/** 주 스트립 달력 — 기한 창의 주만(1~3줄). 되는 날만 살아 있고, 선택된 날은 솔리드. */
+function WeekStrip({
+  windowDays,
+  dayTone,
+  selectedDay,
+  onPick,
+}: {
+  windowDays: string[];
+  /** 후보 있는 날 → 톤(ok=파랑/warn=주황). 없는 날은 흐림·비활성. */
+  dayTone: Map<string, 'ok' | 'warn'>;
+  selectedDay: string | null;
+  onPick: (day: string) => void;
+}) {
+  const mondays = weekMondays(windowDays);
+  const inWindow = new Set(windowDays);
+  return (
+    <div className="grid grid-cols-5 gap-y-2">
+      {WEEKDAY_SHORT.slice(0, 5).map((w) => (
+        <span key={w} className="pb-0.5 text-center text-[12px] text-text-faint">
+          {w}
+        </span>
+      ))}
+      {mondays.map((monday) => (
+        <Fragment key={monday}>
+          {[0, 1, 2, 3, 4].map((i) => {
+            const day = addDaysISO(monday, i);
+            const tone = dayTone.get(day);
+            const selected = day === selectedDay;
+            return (
+              <button
+                key={day}
+                type="button"
+                disabled={!tone}
+                aria-pressed={selected}
+                aria-label={`${fmtDayKorean(day)}${tone ? '' : ' — 후보 없음'}`}
+                onClick={() => onPick(day)}
+                className={`pressable relative mx-auto flex h-11 w-11 items-center justify-center rounded-[14px] text-[15px] font-semibold ${
+                  selected
+                    ? 'bg-primary text-white shadow-[0_2px_10px_rgba(0,0,0,0.35)]'
+                    : tone === 'ok'
+                      ? 'bg-primary-tint font-bold text-primary-pressed'
+                      : tone === 'warn'
+                        ? 'bg-warn-bg font-bold text-warn-fg'
+                        : inWindow.has(day)
+                          ? 'text-text-faint'
+                          : 'text-border'
+                }`}
+              >
+                {Number(day.slice(8, 10))}
+                {tone && !selected && (
+                  <span
+                    aria-hidden
+                    className={`absolute bottom-[5px] h-1 w-1 rounded-full ${tone === 'ok' ? 'bg-primary' : 'bg-warn-fg'}`}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
+/** 참석자 한 줄 — 체크 아바타(✓=필수). PC는 인라인 펼침, 모바일은 바텀시트(보기 전용). */
+function AttendeeLine({ attendees, desktop }: { attendees: Attendee[]; desktop: boolean }) {
+  const [open, setOpen] = useState(false); // PC 인라인 펼침
+  const [sheetOpen, setSheetOpen] = useState(false); // 모바일 시트
+  const MAX = 7;
+  const shown = attendees.slice(0, MAX);
+  const extra = attendees.length - shown.length;
+  const rows = (
+    <div className="mt-1">
+      {attendees.map((a) => (
+        <div key={a.id} className="flex min-h-[52px] items-center gap-3 py-1.5">
+          <Avatar person={a} size={32} />
+          <span aria-hidden className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: personColor(a.id) }} />
+          <span className="text-[15px] font-medium text-text-strong">{a.name}</span>
+          {a.isOrganizer && <span className="text-[12px] text-text-weak">나 · 주최자</span>}
+          {/* 셋업과 같은 필 문법 — 보기 전용(여기선 조건을 바꾸지 않는다) */}
+          <span
+            className={`ml-auto rounded-full px-2.5 py-1.5 text-[12px] font-semibold ${
+              a.attendanceType === 'required' ? 'bg-primary-tint text-primary' : 'bg-section text-text-weak'
+            }`}
+          >
+            {a.attendanceType === 'required' ? '꼭 참석' : '선택'}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => (desktop ? setOpen((o) => !o) : setSheetOpen(true))}
+        aria-expanded={desktop ? open : sheetOpen}
+        className="flex min-h-[48px] w-full items-center gap-2.5 py-2 text-left"
+      >
+        <span className="text-[14px] font-semibold text-text-strong">
+          참석자 <span className="text-primary">{attendees.length}명</span>
+        </span>
+        <span className="flex pl-1">
+          {shown.map((a) => (
+            <span key={a.id} className="relative -ml-1.5 first:ml-0">
+              <span
+                className="flex h-7 w-7 items-center justify-center rounded-full"
+                style={{ boxShadow: `0 0 0 2px ${personColor(a.id)}` }}
+              >
+                <Avatar person={a} size={28} />
+              </span>
+              {a.attendanceType === 'required' && (
+                <span
+                  aria-hidden
+                  className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#000000] text-[7px] font-black text-white ring-2 ring-white"
+                >
+                  ✓
+                </span>
+              )}
+            </span>
+          ))}
+          {extra > 0 && (
+            <span className="-ml-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-section text-[11px] font-semibold text-text-weak ring-2 ring-white">
+              +{extra}
+            </span>
+          )}
+        </span>
+        {desktop ? (
+          <ChevronDown
+            size={15}
+            aria-hidden
+            className={`ml-auto shrink-0 text-text-faint transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          />
+        ) : (
+          /* 시트를 여는 행 — 펼침(⌄)이 아니라 층 이동(›)의 어포던스. */
+          <ChevronRight size={15} aria-hidden className="ml-auto shrink-0 text-text-faint" />
+        )}
+      </button>
+      {desktop && open && rows}
+      <MobileSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title={`참석자 ${attendees.length}명`}>
+        {rows}
+      </MobileSheet>
+    </div>
+  );
+}
+
+/** 후보 행 — 시간 굵게 + 차이 나는 사정 한 줄 + 배지. */
+function SlotRow({
+  slot,
+  selected,
+  badge,
+  onSelect,
+}: {
+  slot: CandidateSlot;
+  selected: boolean;
+  badge?: ReactNode;
+  onSelect: () => void;
+}) {
+  return (
+    /* 선택 행 — 배경 없이, 오른쪽 체크가 선택을 말한다. */
+    <button
+      type="button"
+      onClick={onSelect}
+      aria-pressed={selected}
+      className="pressable flex w-full items-center gap-3 rounded-2xl px-1 py-3 text-left transition-colors hover:bg-section/50"
+    >
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-1.5">
+          <span className="truncate text-[15px] font-bold tracking-[-0.01em] text-text-strong">
+            {fmtDayLabel(slot.day)} {fmtTime(slot.start)}
+          </span>
+          {badge}
+        </span>
+        <span className="mt-0.5 block truncate text-[12px] leading-[1.5] text-text-weak">{cardReason(slot)}</span>
+      </span>
+      <Check
+        size={22}
+        strokeWidth={3}
+        aria-hidden
+        className={`shrink-0 transition-colors ${selected ? 'text-primary' : 'text-[#DADADA]'}`}
+      />
+    </button>
+  );
+}
+
+const BADGE_REC = (
+  <span className="shrink-0 rounded-lg bg-primary-tint px-2 py-1 text-[11px] font-bold text-primary">추천</span>
+);
+const BADGE_PARTIAL = (
+  <span className="shrink-0 rounded-lg bg-[#EEEEEE] px-2 py-1 text-[11px] font-bold text-[#000000]">부분</span>
+);
+const BADGE_WARN = (
+  <span className="shrink-0 rounded-lg bg-warn-bg px-2 py-1 text-[11px] font-bold text-warn-fg">아쉬움</span>
+);
+
+function badgeOf(slot: CandidateSlot, recommended: boolean): ReactNode {
+  if (slot.severity === 'warning') return BADGE_WARN;
+  if (slot.partials.length > 0) return BADGE_PARTIAL;
+  if (recommended) return BADGE_REC;
+  return undefined;
+}
+
+/** 완화 제안 행들 — 결정 모먼트의 손. 고르면 조건이 바뀌며 화면이 리빌된다. */
+function SuggestionRows({
+  suggestions,
+  onPick,
+}: {
+  suggestions: RelaxationSuggestion[];
+  onPick: (s: RelaxationSuggestion) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      {suggestions.map((s) => (
+        <button
+          key={`${s.kind}:${s.targetId ?? ''}`}
+          type="button"
+          onClick={() => onPick(s)}
+          className="pressable flex w-full items-center gap-3 rounded-2xl bg-[#F8F8F8] px-4 py-3.5 text-left hover:bg-section"
+        >
+          <span className="min-w-0 flex-1">
+            <span className="block text-[14px] font-semibold leading-[1.4] text-text-strong">{s.label}</span>
+            <span className="mt-0.5 block text-[12px] leading-[1.4] text-text-weak">{s.resultSummary}</span>
+          </span>
+          <ChevronRight size={16} aria-hidden className="shrink-0 text-text-faint" />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ── 겹침 타임라인 ──────────────────────────────────────────────────
+
+interface TimelineItem {
+  key: string;
+  start: number;
+  end: number;
+  title: string;
+  kind: EventKind;
+  owner: string | null;
+  /** 블록 색 — 사람색(병합 점심은 중립). */
+  color: string;
+}
+
+/** 그날 팀의 일정 — 점심은 겹침 사슬로 병합('점심 · N명'), 나머지는 주인 이름을 단다. */
+export function timelineItems(attendees: Attendee[], day: string): TimelineItem[] {
+  const items: TimelineItem[] = [];
+  const lunches: { start: number; end: number; owner: string; color: string }[] = [];
+  for (const a of attendees) {
+    const color = personColor(a.id);
+    for (const e of a.events) {
+      if (e.day !== day) continue;
+      if (e.kind === 'lunch') lunches.push({ start: e.start, end: e.end, owner: a.name, color });
+      else items.push({ key: `${a.id}-${e.id}`, start: e.start, end: e.end, title: e.title, kind: e.kind, owner: a.name, color });
+    }
+  }
+  lunches.sort((x, y) => x.start - y.start || x.end - y.end);
+  let cluster: typeof lunches = [];
+  let clusterEnd = -1;
+  const flush = () => {
+    if (cluster.length === 0) return;
+    if (cluster.length === 1) {
+      const l = cluster[0];
+      items.push({ key: `lunch-${l.owner}-${l.start}`, start: l.start, end: l.end, title: '점심', kind: 'lunch', owner: l.owner, color: l.color });
+    } else {
+      const start = Math.min(...cluster.map((l) => l.start));
+      const end = Math.max(...cluster.map((l) => l.end));
+      items.push({ key: `lunch-merged-${start}`, start, end, title: `점심 · ${cluster.length}명`, kind: 'lunch', owner: null, color: MERGED_COLOR });
+    }
+    cluster = [];
+  };
+  for (const l of lunches) {
+    if (cluster.length === 0 || l.start < clusterEnd) {
+      cluster.push(l);
+      clusterEnd = Math.max(clusterEnd, l.end);
+    } else {
+      flush();
+      cluster.push(l);
+      clusterEnd = l.end;
+    }
+  }
+  flush();
+  return items.sort((x, y) => x.start - y.start || x.end - y.end || x.key.localeCompare(y.key));
+}
+
+/** 겹침 레인 배정 — 겹치면 반 칸씩 옆으로. 결정적. */
+export function withLanes(items: TimelineItem[]): (TimelineItem & { lane: number })[] {
+  const laneEnds: number[] = [];
+  return items.map((item) => {
+    let lane = laneEnds.findIndex((end) => end <= item.start);
+    if (lane === -1) {
+      lane = laneEnds.length;
+      laneEnds.push(item.end);
+    } else {
+      laneEnds[lane] = item.end;
+    }
+    return { ...item, lane: Math.min(lane, 3) };
+  });
+}
+
+const TL_START = 540; // 9:00
+const TL_END = 1080; // 18:00
+const TL_PX_PER_MIN = 1.2;
+
+function OverlapTimeline({
+  attendees,
+  day,
+  slot,
+  meetingTitle,
+  ghosts,
+  onPick,
+  reduced,
+}: {
+  attendees: Attendee[];
+  day: string;
+  slot: CandidateSlot | null;
+  /** 선택 자리에 앉을 회의 제목 — '여기로 잡을게요' 같은 선언 대신 실물이 앉는다. */
+  meetingTitle: string;
+  /** 같은 날의 선택 안 된 후보 — 점선 고스트로 앉아 있다(홈 응답대기 고스트 문법). */
+  ghosts: CandidateSlot[];
+  onPick: (slot: CandidateSlot) => void;
+  reduced: boolean;
+}) {
+  const items = useMemo(() => withLanes(timelineItems(attendees, day)), [attendees, day]);
+  // 그날 쓰인 레인 수만큼 전체 폭을 나눠 갖는다(35% 겹침) — 오른쪽 끝까지 딱 맞게.
+  const laneCount = Math.max(...items.map((i) => i.lane), 0) + 1;
+  const y = (minute: number) => (Math.min(Math.max(minute, TL_START), TL_END) - TL_START) * TL_PX_PER_MIN;
+
+  return (
+    <div className="relative" style={{ height: (TL_END - TL_START) * TL_PX_PER_MIN }}>
+      {/* 줄 없이 시간 라벨만 — 홈 캘린더처럼 공기 위에 카드가 뜬다. */}
+      {Array.from({ length: (TL_END - TL_START) / 60 + 1 }, (_, i) => TL_START + i * 60).map((h) => {
+        const hour = h / 60;
+        return (
+          <span
+            key={h}
+            aria-hidden
+            className="absolute left-0 w-8 -translate-y-2 text-right text-[10px] leading-4 text-text-faint"
+            style={{ top: y(h) }}
+          >
+            {hour <= 12 ? `${hour}시` : `${hour - 12}시`}
+          </span>
+        );
+      })}
+      <div className="absolute inset-y-0 left-11 right-0">
+        {items.map((item) => {
+          const h = Math.max(y(item.end) - y(item.start), 12);
+          // 모든 레인이 같은 폭(W) — 시작점만 균등 분배해 첫 레인은 왼끝, 마지막 레인은 오른끝에 닿는다.
+          const W = Math.min(100, (100 / laneCount) * 1.35);
+          const left = laneCount > 1 ? (item.lane * (100 - W)) / (laneCount - 1) : 0;
+          return (
+            /* 텍스트 없이 색으로만 — 사람색 반투명(뒤가 비쳐 겹침이 읽힌다). 궁금하면 호버(툴팁). */
+            <div
+              key={item.key}
+              className="group absolute rounded-[10px]"
+              style={{
+                top: y(item.start) + 2,
+                height: Math.max(h - 5, 10),
+                left: `${left}%`,
+                width: `${W}%`,
+                backgroundColor: `${item.color}59`,
+              }}
+            >
+              <span className="pointer-events-none absolute -top-7 left-1 z-20 hidden whitespace-nowrap rounded-lg bg-[#3C3C3C] px-2 py-1 text-[11px] font-medium text-white shadow-[0_4px_12px_rgba(30,30,30,0.25)] group-hover:block">
+                {item.title}
+                {item.owner ? ` · ${item.owner}` : ''}
+              </span>
+            </div>
+          );
+        })}
+        {/* 고스트 후보 — 점선으로 앉아 있다가 호버하면 파랗게 차오른다(홈 고스트와 같은 어휘). 탭 = 선택. */}
+        <AnimatePresence initial={false}>
+        {ghosts.map((g) => (
+          <motion.button
+            key={g.id}
+            type="button"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={reduced ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
+            aria-label={`${fmtTime(g.start)} 후보 선택`}
+            onClick={() => onPick(g)}
+            className="group/ghost absolute inset-x-0 z-[5] flex flex-col items-start justify-start rounded-[10px] border-[1.5px] border-dashed border-primary/45 bg-primary/[0.04] px-3.5 py-2 text-left transition-all duration-200 hover:z-20 hover:border-transparent hover:bg-primary hover:shadow-[0_4px_14px_rgba(0,0,0,0.35)]"
+            style={{ top: y(g.start) + 2, height: Math.max(y(g.end) - y(g.start) - 5, 20) }}
+          >
+            {/* 솔리드 카드와 같은 순서 — 제목 먼저, 시간 아래. */}
+            <span className="block truncate text-[13px] font-bold text-primary/80 transition-colors group-hover/ghost:text-white">
+              {meetingTitle}
+            </span>
+            <span className="block text-[11px] font-medium text-primary/60 transition-colors group-hover/ghost:text-white/85">
+              {fmtTime(g.start)} – {fmtTime(g.end)}
+            </span>
+          </motion.button>
+        ))}
+        </AnimatePresence>
+        {/* 선택된 추천 — 빈틈에 앉은 솔리드 블랙. 선택이 바뀌면 스프링으로 이동한다. */}
+        <AnimatePresence initial={false}>
+        {slot && (
+          <motion.div
+            key={slot.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={reduced ? { duration: 0 } : { duration: 0.22, ease: 'easeOut' }}
+            className="absolute inset-x-0 z-10 rounded-[10px] bg-primary px-3.5 py-2 text-white shadow-[0_4px_14px_rgba(0,0,0,0.35)]"
+            style={{ top: y(slot.start) + 2, height: Math.max(y(slot.end) - y(slot.start) - 5, 20) }}
+          >
+            {/* 홈 카드와 같은 순서 — 제목이 먼저, 시간이 아래(단일 문법). */}
+            <p className="truncate text-[14px] font-bold leading-[1.35]">{meetingTitle}</p>
+            <p className="mt-0.5 text-[11.5px] font-medium leading-[1.35] opacity-85">
+              {fmtTime(slot.start)} – {fmtTime(slot.end)}
+            </p>
+          </motion.div>
+        )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+// ── 본체 ───────────────────────────────────────────────────────────
+
+export interface FindTimeProps {
+  state: AppState;
+  dispatch: Dispatch<Action>;
+  candidates: Candidates;
+}
+
+export default function FindTime({ state, dispatch, candidates }: FindTimeProps) {
+  const reduced = !!useReducedMotion();
+  const desktop = useIsDesktop();
+  const { attendees, windowDays, slots, suggestions, bottleneck } = candidates;
+
+  const requiredCount = attendees.filter((a) => a.attendanceType === 'required').length;
+  const optionalCount = attendees.length - requiredCount;
+
+  // ── 표시 셀렉션 — Q2·Q6·Q7 ──
+  const goodish = useMemo(() => slots.filter((s) => s.severity !== 'warning'), [slots]);
+  const warnings = useMemo(() => slots.filter((s) => s.severity === 'warning'), [slots]);
+  const empty = slots.length === 0; // 상태 C
+  const allWarning = !empty && goodish.length === 0; // 상태 B
+  const recommended = useMemo(() => pickRecommended(goodish), [goodish]);
+  const baseList = allWarning ? warnings.slice(0, 3) : recommended;
+
+  // 달력 — 후보 있는 날의 톤(좋음이 아쉬움을 덮는다)
+  const dayTone = useMemo(() => {
+    const m = new Map<string, 'ok' | 'warn'>();
+    if (allWarning) for (const s of warnings) m.set(s.day, 'warn');
+    else for (const s of goodish) m.set(s.day, 'ok'); // 클릭 안 되는 날은 표시도 없다
+    return m;
+  }, [goodish, warnings, allWarning]);
+
+  // ── 선택 — 1위가 미리 골라져 있다(백지 선택 금지) ──
+  const [selectedId, setSelectedId] = useState<string | null>(state.selectedSlotId);
+  const [dayFilter, setDayFilter] = useState<string | null>(null);
+  const listShown = useMemo(() => {
+    const base = !dayFilter
+      ? baseList
+      : (allWarning ? warnings : goodish).filter((s) => s.day === dayFilter).slice(0, 4);
+    // 계약: 선택한 시간은 언제나 리스트에 체크로 보인다 — 타임라인 고스트·더보기 칩으로
+    // 추천 밖 슬롯을 골라도, 시트를 내리면 그 시간이 맨 위 행으로 서 있어야 한다.
+    const sel = selectedId ? slots.find((s) => s.id === selectedId) : null;
+    if (sel && !base.some((b) => b.id === sel.id)) return [sel, ...base];
+    return base;
+  }, [dayFilter, baseList, goodish, warnings, allWarning, selectedId, slots]);
+  const active = useMemo(
+    () => slots.find((s) => s.id === selectedId) ?? listShown[0] ?? baseList[0] ?? null,
+    [slots, selectedId, listShown, baseList],
+  );
+
+  const select = (slot: CandidateSlot) => {
+    setSelectedId(slot.id);
+    dispatch({ type: 'SELECT_SLOT', slotId: slot.id });
+  };
+
+  const pickDay = (day: string) => {
+    if (dayFilter === day) {
+      setDayFilter(null);
+      return;
+    }
+    const pool = (allWarning ? warnings : goodish).filter((s) => s.day === day);
+    if (pool.length === 0) return;
+    setDayFilter(day);
+    select(pool[0]);
+  };
+
+  // ── '한 번만' 규칙 — 같은 조건 조합의 제안엔 1회만 ──
+  const condKey = decisionKey(state);
+  const [answeredKey, setAnsweredKey] = useState<string | null>(null);
+  const showSuggestions = suggestions.length > 0 && (empty || condKey !== answeredKey);
+  const pickSuggestion = (s: RelaxationSuggestion) => {
+    setAnsweredKey(condKey);
+    setDayFilter(null);
+    const action = pickAction(s, state.deadline);
+    if (action) dispatch(action);
+  };
+
+  // ── 더 보기 ──
+  const [moreOpen, setMoreOpen] = useState(false);
+  const restByDay = useMemo(() => {
+    const rest = goodish.filter((s) => !recommended.some((r) => r.id === s.id));
+    const byDay = new Map<string, CandidateSlot[]>();
+    for (const s of rest) byDay.set(s.day, [...(byDay.get(s.day) ?? []), s]);
+    return [...byDay.entries()];
+  }, [goodish, recommended]);
+  // 아쉬운 후보는 전부-아쉬움 상태에서만 센다 — 좋은 답이 있으면 더 보기도 좋은 시간만(단순함).
+  const moreCount = allWarning
+    ? Math.max(warnings.length - baseList.length, 0)
+    : goodish.length - recommended.length;
+
+  // ── 헤드라인 — 상태 선언 ──
+  const partialTarget = state.allowPartialRequiredId
+    ? (attendees.find((a) => a.id === state.allowPartialRequiredId) ?? null)
+    : null;
+  const loose = goodish.length >= 15;
+  const countsLine = `${DEADLINE_LABEL[state.deadline]} · 필수 ${requiredCount}명${
+    optionalCount > 0 ? ` · 선택 ${optionalCount}명` : ''
+  } · 후보 ${allWarning ? warnings.length : goodish.length}개`;
+
+  let headline: string;
+  let sub: string;
+  if (empty) {
+    headline = `${WINDOW_LABEL[state.deadline]}까지는\n모두가 편한 시간이 없어요`;
+    sub = bottleneck
+      ? `${bottleneck.name}님의 ${bottleneck.eventTitle}${josa(bottleneck.eventTitle, '이', '가')} 겹쳐요. 어떻게 할까요?`
+      : '조건을 조금 바꿔볼까요?';
+  } else if (allWarning) {
+    headline = '가능한 시간이 다 조금 아쉬워요';
+    sub = bottleneck
+      ? `${bottleneck.name}님의 ${bottleneck.eventTitle}${josa(bottleneck.eventTitle, '이', '가')} 겹쳐요`
+      : countsLine;
+  } else if (partialTarget) {
+    headline = `${partialTarget.name}님이 일부만 함께하면 돼요`;
+    sub = countsLine;
+  } else if (goodish.length === 1) {
+    headline = '이 시간뿐이에요';
+    sub = countsLine;
+  } else {
+    headline = slots.some((s) => s.severity === 'good')
+      ? `모두 가능한 ${DURATION_LABEL[state.duration]}이에요`
+      : '다들 가능한데, 조금씩 사정이 있어요';
+    sub = loose ? '거의 언제든 괜찮아요 — 편한 날을 골라보세요' : countsLine;
+  }
+
+  // ── 확정 ──
+  const confirm = () => {
+    if (!active) return;
+    dispatch({ type: 'SELECT_SLOT', slotId: active.id });
+    dispatch({ type: 'SET_STEP', step: 'confirm' });
+  };
+  const cta = active && (
+    <button
+      type="button"
+      onClick={confirm}
+      className="pressable h-[54px] w-full rounded-2xl bg-primary text-[16px] font-semibold text-white active:bg-primary-pressed"
+    >
+      이 시간으로 잡을게요
+    </button>
+  );
+
+  const [timelineOpen, setTimelineOpen] = useState(false);
+
+  return (
+    <div className="min-h-dvh bg-bg pb-32 lg:pb-12">
+      {/* 데스크톱 헤더 — 셋업·홈과 같은 오로라·워드마크 틀 */}
+      <div className="relative hidden lg:block">
+        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+          <Aurora variant="home" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-white" />
+        </div>
+        <div className="relative mx-auto max-w-[1200px] px-6 py-4">
+          <header className="flex h-10 items-center">
+            <Wordmark />
+          </header>
+        </div>
+      </div>
+
+      {/* 뒤로가기 줄 — 조건을 바꾸고 싶으면 뒤로(셋업). 조건 수정 UI는 여기 없다. */}
+      <FrostedBar innerClassName="mx-auto max-w-[520px] px-4 lg:max-w-[1200px] lg:px-6">
+        <Reveal as="header" className="-mx-1 flex h-14 items-center lg:mx-0">
+          <button
+            type="button"
+            onClick={() => dispatch({ type: 'SET_STEP', step: 'setup' })}
+            aria-label="뒤로"
+            className="pressable -ml-2 flex h-10 w-10 items-center justify-center rounded-full text-text-strong hover:bg-section"
+          >
+            <ChevronLeft size={22} aria-hidden />
+          </button>
+        </Reveal>
+      </FrostedBar>
+
+      <div className="mx-auto max-w-[520px] px-4 lg:max-w-[1200px] lg:px-6 lg:pt-2">
+        <div className="lg:mx-auto lg:max-w-[920px] lg:px-4">
+          <Reveal delay={70} className="pt-3 lg:pt-0">
+            <h1 className="whitespace-pre-line text-[22px] font-bold leading-[1.35] tracking-[-0.02em] text-text-strong">
+              {headline}
+            </h1>
+            <p className="mt-1.5 break-keep text-[13px] leading-[1.5] text-text-weak">{sub}</p>
+          </Reveal>
+
+          {empty ? (
+            /* ── 상태 C — 달력 소멸, 결정 제안이 무대 ── */
+            <div className="lg:max-w-[480px]">
+              <Reveal delay={160} className="pt-7">
+                {showSuggestions ? (
+                  <SuggestionRows suggestions={suggestions} onPick={pickSuggestion} />
+                ) : (
+                  <p className="rounded-2xl bg-[#F8F8F8] px-4 py-3.5 text-[13px] leading-[1.6] text-text-weak">
+                    뒤로 가서 참석자나 회의 길이를 바꿔 주시면 바로 다시 찾아볼게요.
+                  </p>
+                )}
+              </Reveal>
+              <Reveal delay={240} className="pt-8">
+                <AttendeeLine attendees={attendees} desktop={desktop} />
+              </Reveal>
+            </div>
+          ) : (
+            /* ── 상태 A·B·D — 좌 달력·참석자 / 우 추천·타임라인·CTA ── */
+            <div className="lg:grid lg:grid-cols-[0.85fr_1.15fr] lg:grid-rows-[auto_auto_1fr] lg:gap-x-14">
+              <Reveal delay={140} className="pt-6 lg:col-start-1 lg:row-start-1">
+                <WeekStrip
+                  windowDays={windowDays}
+                  dayTone={dayTone}
+                  selectedDay={active?.day ?? null}
+                  onPick={pickDay}
+                />
+                <p className="mt-3.5 flex items-center justify-center gap-1.5 text-[12px] text-text-weak lg:justify-start lg:pl-1">
+                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${allWarning ? 'bg-warn-fg' : 'bg-primary'}`} />
+                  {allWarning ? '아쉬운 대로 가능한 날이에요' : '추천이 있는 날이에요 — 눌러서 둘러보세요'}
+                </p>
+              </Reveal>
+
+              <Reveal delay={210} className="pt-7 lg:col-start-1 lg:row-start-2">
+                <p className="text-[14px] font-semibold text-text-strong">
+                  {dayFilter ? `${fmtDayKorean(dayFilter)}의 시간` : allWarning ? '그나마 나은 순이에요' : '추천 순이에요'}
+                </p>
+                <div className="mt-2.5 space-y-2">
+                  {listShown.map((slot) => (
+                    <SlotRow
+                      key={slot.id}
+                      slot={slot}
+                      selected={active?.id === slot.id}
+                      /* 1위 배지는 진짜 추천 1위에게 — 선택 주입 행이 밀어내도 뺏지 않는다. */
+                      badge={badgeOf(slot, !dayFilter && !allWarning && slot.id === recommended[0]?.id)}
+                      onSelect={() => select(slot)}
+                    />
+                  ))}
+                </div>
+
+                {dayFilter ? (
+                  <button
+                    type="button"
+                    onClick={() => setDayFilter(null)}
+                    className="pressable mt-2.5 w-full rounded-xl py-2 text-center text-[13px] font-medium text-text-weak hover:bg-section/60"
+                  >
+                    전체 추천으로 돌아가기
+                  </button>
+                ) : (
+                  moreCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setMoreOpen((o) => !o)}
+                      aria-expanded={moreOpen}
+                      className="pressable mt-2.5 w-full rounded-xl py-2 text-center text-[13px] font-medium text-text-weak hover:bg-section/60"
+                    >
+                      {moreOpen ? '접기' : `다른 시간 ${moreCount}개 더 보기`}
+                    </button>
+                  )
+                )}
+
+                {/* 더 보기 — 날짜 그룹 + 시간 칩, 아쉬운 시간은 맨 아래(이유 동반) */}
+                {moreOpen && !dayFilter && (
+                  <div className="mt-2 space-y-4 rounded-2xl bg-[#FAFAFA] p-4">
+                    {!allWarning &&
+                      restByDay.map(([day, arr]) => (
+                        <div key={day}>
+                          <p className="text-[12px] font-semibold text-text-weak">{fmtDayKorean(day)}</p>
+                          <div className="mt-1.5 flex flex-wrap gap-1.5">
+                            {arr.map((s) => (
+                              <button
+                                key={s.id}
+                                type="button"
+                                aria-pressed={active?.id === s.id}
+                                onClick={() => select(s)}
+                                className={`pressable rounded-xl px-3 py-2 text-[13px] font-semibold ${
+                                  active?.id === s.id
+                                    ? 'bg-primary text-white'
+                                    : 'bg-white text-text-body shadow-[0_1px_3px_rgba(30,30,30,0.06)] hover:bg-section'
+                                }`}
+                              >
+                                {fmtTime(s.start)}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    {allWarning && warnings.slice(3, 7).length > 0 && (
+                      <div className="space-y-1.5">
+                        {warnings.slice(3, 7).map((slot) => (
+                          <SlotRow
+                            key={slot.id}
+                            slot={slot}
+                            selected={active?.id === slot.id}
+                            badge={BADGE_WARN}
+                            onSelect={() => select(slot)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 전부 아쉬울 때만 — 완화 제안이 본문에 함께 선다(상태 B) */}
+                {allWarning && showSuggestions && (
+                  <div className="mt-5">
+                    <p className="text-[14px] font-semibold text-text-strong">이렇게 풀 수도 있어요</p>
+                    <div className="mt-2.5">
+                      <SuggestionRows suggestions={suggestions} onPick={pickSuggestion} />
+                    </div>
+                  </div>
+                )}
+
+              </Reveal>
+
+              <Reveal delay={250} className="pt-8 lg:col-start-1 lg:row-start-3">
+                <AttendeeLine attendees={attendees} desktop={desktop} />
+              </Reveal>
+
+              <Reveal delay={300} className="lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:pt-6">
+                {/* 그날의 모두의 일정 — PC 상시(우측 전용 무대), 모바일은 접힘(Q8) */}
+                {active && (
+                  <div className="mt-4 lg:mt-0">
+                    {/* 모바일 — 행을 탭하면 바텀시트(아코디언 대신 바텀시트). */}
+                    <button
+                      type="button"
+                      onClick={() => setTimelineOpen(true)}
+                      className="pressable flex min-h-[48px] w-full items-center justify-between rounded-xl py-3 text-[14px] font-semibold text-text-strong lg:hidden"
+                    >
+                      {fmtDayKorean(active.day)} 모두의 일정
+                      <ChevronRight size={15} aria-hidden className="text-text-faint" />
+                    </button>
+                    <MobileSheet
+                      open={timelineOpen}
+                      onClose={() => setTimelineOpen(false)}
+                      title={`${fmtDayKorean(active.day)} 모두의 일정`}
+                    >
+                      <div className="pb-2 pt-4">
+                        <OverlapTimeline
+                          attendees={attendees}
+                          day={active.day}
+                          slot={active}
+                          meetingTitle={state.title.trim() || '새 회의'}
+                          ghosts={(allWarning ? warnings : goodish)
+                            .filter((s) => s.day === active.day && s.id !== active.id)
+                            .slice(0, 4)}
+                          onPick={select}
+                          reduced={reduced}
+                        />
+                      </div>
+                    </MobileSheet>
+
+                    {/* PC — 상시 노출(우측 전용 무대). */}
+                    <div className="hidden lg:block">
+                      <p className="pb-6 text-[12px] leading-4 text-text-faint">
+                        {fmtDayKorean(active.day)} 모두의 일정
+                      </p>
+                      <OverlapTimeline
+                        attendees={attendees}
+                        day={active.day}
+                        slot={active}
+                        meetingTitle={state.title.trim() || '새 회의'}
+                        ghosts={(allWarning ? warnings : goodish)
+                          .filter((s) => s.day === active.day && s.id !== active.id)
+                          .slice(0, 4)}
+                        onPick={select}
+                        reduced={reduced}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="hidden pt-6 lg:block">{cta}</div>
+              </Reveal>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 모바일 고정 CTA — 셋업과 같은 하단 frost */}
+      {!empty && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-40 px-4 pt-6 lg:hidden"
+          style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-white via-white/85 to-transparent"
+          />
+          <div className="relative mx-auto max-w-[520px]">{cta}</div>
+        </div>
+      )}
+    </div>
+  );
+}
