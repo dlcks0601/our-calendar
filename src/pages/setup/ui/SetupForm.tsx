@@ -477,7 +477,7 @@ export default function SetupForm({ state, dispatch, onSaved }: SetupFormProps) 
             >
               <span
                 aria-hidden
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-dashed border-gray-400 text-muted"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-dashed border-faint text-muted"
               >
                 <Plus size={15} strokeWidth={2.4} />
               </span>
@@ -554,7 +554,7 @@ export default function SetupForm({ state, dispatch, onSaved }: SetupFormProps) 
         {/* 하단 frost — 접히는 폼이 반투명 너머로 흐릿하게 지나간다. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-gray-0 via-gray-0/85 to-transparent"
+          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-page via-page/85 to-transparent"
         />
         <div className="relative mx-auto max-w-[520px]">{cta}</div>
       </div>

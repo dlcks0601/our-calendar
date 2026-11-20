@@ -1,6 +1,7 @@
 /**
- * 색 명세 — 팔레트 → 역할 → 일정 종류·사람 순으로 쌓는다.
- * 화면은 팔레트를 직접 쓰지 않고 역할 이름으로 쓴다. 값은 여기 한 곳에만 있다.
+ * 색 명세 — 팔레트 → 역할 → 일정 종류·사람 순으로 쌓는다. 값은 여기 한 곳에만 있다.
+ * 무채색은 화면에서 역할 이름으로만 쓴다(`text-strong`, `bg-ink`, `ring-page`). 테스트가 지킨다.
+ * 색 계열은 색이 곧 정보인 곳(일정 종류, 사람, 안내 배지, 제안 카드, 완료·스캔 화면의 배경)에서 팔레트 단계를 직접 쓴다.
  */
 
 /** 팔레트: 계열별 단계표. 숫자가 클수록 진하다. 실제로 쓰이는 단계만 둔다. */
@@ -13,7 +14,9 @@ export const PALETTE = {
     300: '#D6D6D6',
     400: '#B8B8B8',
     500: '#8C8C8C',
+    600: '#6B6B6B',
     700: '#4A4A4A',
+    800: '#3C3C3C',
     900: '#2E2E2E',
     1000: '#000000',
   },
@@ -59,11 +62,17 @@ export const FG = {
 /** 바탕 색. 클래스는 `bg-<이름>`. 주 행동은 검정(ink)이다. */
 export const BG = {
   page: 'gray-0',
+  /** 목록 행과 묶음 상자의 가장 옅은 면. 올리면 subtle로 한 단계 진해진다. */
+  faint: 'gray-50',
   subtle: 'gray-100',
   muted: 'gray-200',
   ink: 'gray-1000',
   'ink-pressed': 'gray-900',
+  /** 화면 위에 떠서 알리는 어두운 면 — 토스트, 말풍선. */
+  'ink-soft': 'gray-900',
   'warning-weak': 'yellow-100',
+  /** 아쉬운 후보를 알리는 점. */
+  warning: 'yellow-800',
   positive: 'green-800',
   alert: 'red-500',
 } as const satisfies Record<string, PaletteRef>;
@@ -72,7 +81,11 @@ export const BG = {
 export const STROKE = {
   default: 'gray-200',
   strong: 'gray-300',
+  /** 점선 테두리처럼 선만으로 자리를 알릴 때. */
+  faint: 'gray-400',
   ink: 'gray-1000',
+  /** 겹친 아바타와 배지를 바탕색으로 갈라 주는 선. */
+  page: 'gray-0',
 } as const satisfies Record<string, PaletteRef>;
 
 /** 일정 종류 → 색 계열. 종류는 색으로 구분한다. */

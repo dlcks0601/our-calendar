@@ -137,7 +137,7 @@ function WeekStrip({
                 {tone && !selected && (
                   <span
                     aria-hidden
-                    className={`absolute bottom-[5px] h-1 w-1 rounded-full ${tone === 'ok' ? 'bg-ink' : 'bg-yellow-800'}`}
+                    className={`absolute bottom-[5px] h-1 w-1 rounded-full ${tone === 'ok' ? 'bg-ink' : 'bg-warning'}`}
                   />
                 )}
               </button>
@@ -199,7 +199,7 @@ function AttendeeLine({ attendees, desktop }: { attendees: Attendee[]; desktop: 
               {a.attendanceType === 'required' && (
                 <span
                   aria-hidden
-                  className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-positive text-micro font-black text-on-ink ring-2 ring-gray-0"
+                  className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-positive text-micro font-black text-on-ink ring-2 ring-page"
                 >
                   ✓
                 </span>
@@ -207,7 +207,7 @@ function AttendeeLine({ attendees, desktop }: { attendees: Attendee[]; desktop: 
             </span>
           ))}
           {extra > 0 && (
-            <span className="-ml-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-subtle text-caption font-semibold text-muted ring-2 ring-gray-0">
+            <span className="-ml-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-subtle text-caption font-semibold text-muted ring-2 ring-page">
               +{extra}
             </span>
           )}
@@ -292,7 +292,7 @@ function SuggestionRows({
           key={`${s.kind}:${s.targetId ?? ''}`}
           type="button"
           onClick={() => onPick(s)}
-          className="pressable flex w-full items-center gap-3 rounded-r5 bg-gray-50 px-4 py-3.5 text-left hover:bg-subtle"
+          className="pressable flex w-full items-center gap-3 rounded-r5 bg-faint px-4 py-3.5 text-left hover:bg-subtle"
         >
           <span className="min-w-0 flex-1">
             <span className="block text-body font-semibold leading-snug text-strong">{s.label}</span>
@@ -437,7 +437,7 @@ function OverlapTimeline({
                 backgroundColor: `${item.color}59`,
               }}
             >
-              <span className="pointer-events-none absolute -top-7 left-1 z-20 hidden whitespace-nowrap rounded-r2 bg-gray-900 px-2 py-1 text-caption font-medium text-on-ink shadow-s2 group-hover:block">
+              <span className="pointer-events-none absolute -top-7 left-1 z-20 hidden whitespace-nowrap rounded-r2 bg-ink-soft px-2 py-1 text-caption font-medium text-on-ink shadow-s2 group-hover:block">
                 {item.title}
                 {item.owner ? ` · ${item.owner}` : ''}
               </span>
@@ -674,7 +674,7 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
                 {showSuggestions ? (
                   <SuggestionRows suggestions={suggestions} onPick={pickSuggestion} />
                 ) : (
-                  <p className="rounded-r5 bg-gray-50 px-4 py-3.5 text-body-s leading-loose text-muted">
+                  <p className="rounded-r5 bg-faint px-4 py-3.5 text-body-s leading-loose text-muted">
                     뒤로 가서 참석자나 회의 길이를 바꿔 주시면 바로 다시 찾아볼게요.
                   </p>
                 )}
@@ -694,7 +694,7 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
                   onPick={pickDay}
                 />
                 <p className="mt-3.5 flex items-center justify-center gap-1.5 text-label text-muted lg:justify-start lg:pl-1">
-                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${allWarning ? 'bg-yellow-800' : 'bg-ink'}`} />
+                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${allWarning ? 'bg-warning' : 'bg-ink'}`} />
                   {allWarning ? '아쉬운 대로 가능한 날이에요' : '추천이 있는 날이에요 — 눌러서 둘러보세요'}
                 </p>
               </Reveal>
@@ -739,7 +739,7 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
 
                 {/* 더 보기 — 날짜 그룹 + 시간 칩, 아쉬운 시간은 맨 아래(이유 동반) */}
                 {moreOpen && !dayFilter && (
-                  <div className="mt-2 space-y-4 rounded-r5 bg-gray-50 p-4">
+                  <div className="mt-2 space-y-4 rounded-r5 bg-faint p-4">
                     {!allWarning &&
                       restByDay.map(([day, arr]) => (
                         <div key={day}>
@@ -863,7 +863,7 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
         >
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-gray-0 via-gray-0/85 to-transparent"
+            className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-page via-page/85 to-transparent"
           />
           <div className="relative mx-auto max-w-[520px]">{cta}</div>
         </div>

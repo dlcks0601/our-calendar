@@ -1,4 +1,5 @@
 // 대조할 화면 목록. 참석자와 조건이 주소에 담겨 있어 같은 장면을 그대로 다시 연다.
+// 홈의 달력과 확정 화면의 날짜는 오늘을 기준으로 그려진다. 기준과 비교는 같은 날에 찍어야 대조가 성립한다.
 
 /** 다음 주 수요일 09:00 슬롯 — 확정 화면을 열 때 고른 시간으로 쓴다. */
 function nextWednesdaySlot() {
@@ -18,7 +19,9 @@ const PATHS = [
   ['find-tradeoff', `/?${SIX_REQUIRED}&dl=nw&s=find`],
   ['find-none', `/?${SIX_REQUIRED}&dl=tw&s=find`],
   ['confirm', `/?${THREE}&s=confirm&slot=${nextWednesdaySlot()}`],
+  ['done', `/?${THREE}&s=done&slot=${nextWednesdaySlot()}`],
   ['invite', '/?s=invite'],
+  ['notifications', '/?s=notifications'],
 ];
 
 export const SCREENS = PATHS.flatMap(([name, path]) => [

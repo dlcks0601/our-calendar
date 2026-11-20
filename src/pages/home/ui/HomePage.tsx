@@ -91,7 +91,7 @@ export default function HomePage({
         {/* 하단 frost — 헤더의 미러: 스크롤 콘텐츠가 반투명 너머로 흐릿하게 지나간다(경계 없음). */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-gray-0 via-gray-0/85 to-transparent"
+          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-page via-page/85 to-transparent"
         />
         <ActionButton size="lg" fullWidth
           onClick={openSetup}

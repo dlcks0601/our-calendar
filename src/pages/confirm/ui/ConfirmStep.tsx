@@ -230,7 +230,7 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
         {hasMitigationSection && (
           <Reveal delay={210} className="pt-6">
             <p className="text-body font-semibold text-strong">모두를 위한 조정</p>
-            <div className="mt-2.5 divide-y divide-default/60 rounded-r5 bg-gray-50">
+            <div className="mt-2.5 divide-y divide-default/60 rounded-r5 bg-faint">
               {opts.delayTen && (
                 <MitigationToggle
                   label="10분 늦춰 시작해 여유를 둘까요?"
@@ -271,18 +271,18 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
         {/* 함께하는 사람들 — 아바타(✓=필수)와 배려 카피. 시간은 서브라인이 말한다. */}
         <Reveal delay={hasMitigationSection ? 280 : 210} className="pt-6">
           <p className="text-body font-semibold text-strong">함께하는 사람들</p>
-          <section className="mt-2.5 rounded-r5 bg-gray-50 p-4">
+          <section className="mt-2.5 rounded-r5 bg-faint p-4">
             {/* 참석자 — 체크 아바타(✓=필수), 시간 찾기와 같은 어휘 */}
             <div className="flex">
               {attendees.slice(0, 8).map((a) => (
                 <span key={a.id} className="relative -ml-1.5 first:ml-0">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full ring-2 ring-gray-0">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full ring-2 ring-page">
                     <Avatar person={a} size={28} />
                   </span>
                   {a.attendanceType === 'required' && (
                     <span
                       aria-hidden
-                      className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-positive text-micro font-black text-on-ink ring-2 ring-gray-0"
+                      className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-positive text-micro font-black text-on-ink ring-2 ring-page"
                     >
                       ✓
                     </span>
@@ -290,7 +290,7 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
                 </span>
               ))}
               {attendees.length > 8 && (
-                <span className="-ml-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-page text-caption font-semibold text-muted ring-2 ring-gray-0">
+                <span className="-ml-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-page text-caption font-semibold text-muted ring-2 ring-page">
                   +{attendees.length - 8}
                 </span>
               )}
@@ -313,7 +313,7 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
         {/* 하단 frost — 요약·장소 카드가 반투명 너머로 흐릿하게 지나간다. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-gray-0 via-gray-0/85 to-transparent"
+          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-page via-page/85 to-transparent"
         />
         <div className="relative mx-auto max-w-[560px]">
           {chosen === null && (

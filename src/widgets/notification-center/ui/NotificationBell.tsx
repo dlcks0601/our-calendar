@@ -154,7 +154,7 @@ export default function NotificationBell({ list = [], unreadCount, onOpen, onSel
               animate={reduced ? { opacity: 1 } : { scale: 1 }}
               exit={reduced ? { opacity: 0 } : { scale: 0 }}
               transition={reduced ? { duration: 0.1 } : SPRING.pop}
-              className="absolute right-[9px] top-[9px] h-2 w-2 rounded-full bg-alert ring-2 ring-gray-0"
+              className="absolute right-[9px] top-[9px] h-2 w-2 rounded-full bg-alert ring-2 ring-page"
             />
           )}
         </AnimatePresence>

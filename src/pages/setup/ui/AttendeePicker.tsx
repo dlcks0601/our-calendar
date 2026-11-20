@@ -126,7 +126,7 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
           initial: { y: '100%' },
           animate: { y: 0 },
           exit: { y: '100%' },
-          transition: SPRING.position,
+          transition: SPRING.sheet,
         };
 
   return (
@@ -274,7 +274,7 @@ export default function AttendeePicker({ attendeeIds, windowDays, onToggle, onCl
         <div className="relative -mt-9 px-5 pb-[max(16px,env(safe-area-inset-bottom))] pt-3.5 lg:pb-5">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 -top-10 bottom-0 bg-gradient-to-t from-gray-0 via-gray-0/85 to-transparent"
+            className="pointer-events-none absolute inset-x-0 -top-10 bottom-0 bg-gradient-to-t from-page via-page/85 to-transparent"
           />
           <ActionButton size="lg" fullWidth
             disabled={confirm.disabled}
