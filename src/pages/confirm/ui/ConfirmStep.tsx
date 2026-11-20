@@ -11,6 +11,10 @@ import { Reveal } from '@/shared/ui/reveal';
 import { Wordmark } from '@/shared/ui/wordmark';
 import { ROOMS, availableRooms } from '@/entities/room';
 import { fmtDayKorean, fmtRange, fmtTime } from '@/shared/lib/time';
+import { SPRING } from '@/shared/tokens';
+import { ActionButton } from '@/shared/ui/action-button';
+import { IconButton } from '@/shared/ui/icon-button';
+import { SelectRow } from '@/shared/ui/select-row';
 
 /**
  * 확정 — 마지막 조정의 자리. 확정 직전에도 긴장 라인을 다시 보여주고(정직함 유지),
@@ -30,7 +34,7 @@ import { fmtDayKorean, fmtRange, fmtTime } from '@/shared/lib/time';
 // ── 작은 조각들 ────────────────────────────────────────────────────
 
 /** 위치 이동 스프링 — FLIP 재정렬(리스트·토스트와 같은 {350, 30} 규칙). */
-const POSITION_SPRING = { type: 'spring' as const, stiffness: 350, damping: 30 };
+const POSITION_SPRING = SPRING.position;
 
 function MitigationToggle({
   label,
@@ -52,15 +56,15 @@ function MitigationToggle({
       className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
     >
       <span className="min-w-0 flex-1">
-        <span className="block text-[14px] font-semibold leading-[1.4] text-text-strong">{label}</span>
-        <span className="mt-0.5 block text-[12px] leading-[1.4] text-text-weak">{sub}</span>
+        <span className="block text-body font-semibold leading-snug text-strong">{label}</span>
+        <span className="mt-0.5 block text-label leading-snug text-muted">{sub}</span>
       </span>
       {/* 맨 체크 — 위 장소 행들과 같은 선택 어휘(켬 파랑 / 끔 연회색). */}
       <Check
         size={22}
         strokeWidth={3}
         aria-hidden
-        className={`shrink-0 transition-colors ${checked ? 'text-primary' : 'text-[#DADADA]'}`}
+        className={`shrink-0 transition-colors ${checked ? 'text-strong' : 'text-disabled'}`}
       />
     </button>
   );
@@ -83,31 +87,14 @@ function PlaceRow({
   onSelect: () => void;
 }) {
   return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onSelect}
-      className="pressable -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-section/60"
-    >
-      {remote && <Video size={18} aria-hidden className="shrink-0 text-text-weak" />}
-      <span className="min-w-0 flex-1">
-        <span className="flex items-center gap-1.5">
-          <span className="truncate text-[15px] font-bold tracking-[-0.01em] text-text-strong">{title}</span>
-          {recommended && (
-            <span className="shrink-0 rounded-lg bg-primary-tint px-2 py-1 text-[11px] font-bold text-primary">
-              추천
-            </span>
-          )}
-        </span>
-        <span className="mt-0.5 block truncate text-[12px] leading-[1.5] text-text-weak">{sub}</span>
-      </span>
-      <Check
-        size={22}
-        strokeWidth={3}
-        aria-hidden
-        className={`shrink-0 transition-colors ${selected ? 'text-primary' : 'text-[#DADADA]'}`}
-      />
-    </button>
+    <SelectRow
+      title={title}
+      sub={sub}
+      selected={selected}
+      leading={remote ? <Video size={18} aria-hidden className="shrink-0 text-muted" /> : undefined}
+      badge={recommended ? <Badge tone="rec" size="sm">추천</Badge> : undefined}
+      onSelect={onSelect}
+    />
   );
 }
 
@@ -127,18 +114,16 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
   if (!slot) {
     return (
       <main className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col items-center justify-center gap-5 px-4">
-        <Reveal className="w-full rounded-card bg-section px-6 py-12 text-center">
-          <p className="text-[15px] font-semibold text-text-strong">선택한 시간을 찾을 수 없어요</p>
-          <p className="mt-1.5 text-[13px] leading-[1.5] text-text-weak">조건이 바뀌었나 봐요 — 다시 골라주세요</p>
+        <Reveal className="w-full rounded-r5 bg-subtle px-6 py-12 text-center">
+          <p className="text-body-l font-semibold text-strong">선택한 시간을 찾을 수 없어요</p>
+          <p className="mt-1.5 text-body-s leading-normal text-muted">조건이 바뀌었나 봐요 — 다시 골라주세요</p>
         </Reveal>
         <Reveal delay={70}>
-          <button
-            type="button"
+          <ActionButton variant="weak" pill
             onClick={() => dispatch({ type: 'SET_STEP', step: 'find' })}
-            className="pressable inline-flex h-11 items-center rounded-full bg-section px-5 text-[14px] font-semibold text-text-body transition-colors hover:bg-[#F1F1F1]"
           >
             시간 다시 찾기
-          </button>
+          </ActionButton>
         </Reveal>
       </main>
     );
@@ -170,7 +155,7 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
   const hasMitigationSection = opts.delayTen || opts.fiftyMin || slot.partials.length > 0;
 
   return (
-    <main className="min-h-dvh bg-bg pb-44">
+    <main className="min-h-dvh bg-page pb-44">
       {/* 데스크톱 헤더 — 홈·셋업·찾기와 같은 워드마크 틀(스텝이 바뀌어도 유지). */}
       <div className="relative hidden lg:block">
         <div className="relative mx-auto max-w-[1200px] px-6 py-4">
@@ -183,24 +168,23 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
       {/* 헤더 — 뒤로가기 → find. 상시 frost(전 화면 공통 문법). */}
       <FrostedBar innerClassName="mx-auto w-full max-w-[560px] px-4">
         <Reveal as="header" className="-mx-1 flex h-14 items-center">
-          <button
-            type="button"
+          <IconButton
             onClick={() => dispatch({ type: 'SET_STEP', step: 'find' })}
             aria-label="뒤로"
-            className="pressable -ml-2 flex h-10 w-10 items-center justify-center rounded-full text-text-strong hover:bg-section"
+            className="-ml-2"
           >
             <ChevronLeft size={22} aria-hidden />
-          </button>
+          </IconButton>
         </Reveal>
       </FrostedBar>
       <div className="mx-auto w-full max-w-[560px] px-4">
 
         {/* 타이틀 + 서브 */}
         <Reveal delay={70} className="pt-2 lg:pt-0">
-          <h1 className="text-[22px] font-bold leading-[1.35] tracking-[-0.02em] text-text-strong lg:text-[24px]">
+          <h1 className="text-heading font-bold tracking-tight text-strong lg:text-heading-l">
             어디서 할까요?
           </h1>
-          <p className="mt-1.5 text-[13px] leading-[1.5] text-text-weak">
+          <p className="mt-1.5 text-body-s leading-normal text-muted">
             {fmtDayKorean(slot.day)} {fmtRange(adj.start, adj.end)} · {state.title.trim() || '회의'} · {attendees.length}명
           </p>
         </Reveal>
@@ -245,8 +229,8 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
         {/* 모두를 위한 조정 — 이 슬롯이 실제로 가진 긴장에만 반응한다 */}
         {hasMitigationSection && (
           <Reveal delay={210} className="pt-6">
-            <p className="text-[14px] font-semibold text-text-strong">모두를 위한 조정</p>
-            <div className="mt-2.5 divide-y divide-border/60 rounded-card bg-[#F8F8F8]">
+            <p className="text-body font-semibold text-strong">모두를 위한 조정</p>
+            <div className="mt-2.5 divide-y divide-default/60 rounded-r5 bg-faint">
               {opts.delayTen && (
                 <MitigationToggle
                   label="10분 늦춰 시작해 여유를 둘까요?"
@@ -269,10 +253,10 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
                 return (
                   <div key={p.attendeeId} className="flex w-full items-center gap-3 px-4 py-3.5">
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[14px] font-semibold leading-[1.4] text-text-strong">
+                      <span className="block text-body font-semibold leading-snug text-strong">
                         {name}님 퇴장 5분 전 알림
                       </span>
-                      <span className="mt-0.5 block text-[12px] leading-[1.4] text-text-weak">
+                      <span className="mt-0.5 block text-label leading-snug text-muted">
                         &lsquo;함께 챙긴 것&rsquo;에 자동으로 담겨요
                       </span>
                     </span>
@@ -286,19 +270,19 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
 
         {/* 함께하는 사람들 — 아바타(✓=필수)와 배려 카피. 시간은 서브라인이 말한다. */}
         <Reveal delay={hasMitigationSection ? 280 : 210} className="pt-6">
-          <p className="text-[14px] font-semibold text-text-strong">함께하는 사람들</p>
-          <section className="mt-2.5 rounded-card bg-[#F8F8F8] p-4">
+          <p className="text-body font-semibold text-strong">함께하는 사람들</p>
+          <section className="mt-2.5 rounded-r5 bg-faint p-4">
             {/* 참석자 — 체크 아바타(✓=필수), 시간 찾기와 같은 어휘 */}
             <div className="flex">
               {attendees.slice(0, 8).map((a) => (
                 <span key={a.id} className="relative -ml-1.5 first:ml-0">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full ring-2 ring-white">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full ring-2 ring-page">
                     <Avatar person={a} size={28} />
                   </span>
                   {a.attendanceType === 'required' && (
                     <span
                       aria-hidden
-                      className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#1F7A4B] text-[7px] font-black text-white ring-2 ring-white"
+                      className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-positive text-micro font-black text-on-ink ring-2 ring-page"
                     >
                       ✓
                     </span>
@@ -306,7 +290,7 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
                 </span>
               ))}
               {attendees.length > 8 && (
-                <span className="-ml-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-white text-[11px] font-semibold text-text-weak ring-2 ring-white">
+                <span className="-ml-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-page text-caption font-semibold text-muted ring-2 ring-page">
                   +{attendees.length - 8}
                 </span>
               )}
@@ -329,20 +313,18 @@ export default function ConfirmStep({ state, dispatch }: ConfirmStepProps) {
         {/* 하단 frost — 요약·장소 카드가 반투명 너머로 흐릿하게 지나간다. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-white via-white/85 to-transparent"
+          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-page via-page/85 to-transparent"
         />
         <div className="relative mx-auto max-w-[560px]">
           {chosen === null && (
-            <p className="pb-2 text-center text-[12px] font-medium text-text-weak">회의 장소를 골라주세요</p>
+            <p className="pb-2 text-center text-label font-medium text-muted">회의 장소를 골라주세요</p>
           )}
-          <button
-            type="button"
+          <ActionButton size="lg" fullWidth
             onClick={confirmMeeting}
             disabled={chosen === null}
-            className="pressable h-[54px] w-full rounded-2xl bg-primary text-[16px] font-semibold text-white transition-colors active:bg-primary-pressed disabled:bg-section disabled:text-text-faint"
           >
             초대 보내기
-          </button>
+          </ActionButton>
         </div>
       </div>
     </main>

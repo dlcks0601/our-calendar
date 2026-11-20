@@ -2,7 +2,7 @@
 
 import { Fragment, useMemo, useState, type Dispatch, type ReactNode } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { Check, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Avatar, type Attendee } from '@/entities/member';
 import { FrostedBar } from '@/shared/ui/frosted-bar';
 import { MobileSheet } from '@/shared/ui/mobile-sheet';
@@ -12,8 +12,13 @@ import { decisionKey, pickAction, DEADLINE_LABEL, DURATION_LABEL, WINDOW_LABEL, 
 import { addDaysISO, fmtDayKorean, fmtTime, weekMondays } from '@/shared/lib/time';
 import { ANCHOR_DATE } from '@/shared/config';
 import { useIsDesktop } from '@/shared/lib/hooks';
+import { PERSON_COLORS, resolveColor } from '@/shared/tokens';
 import type { CandidateSlot } from '@/entities/slot';
 import type { EventKind } from '@/entities/event';
+import { ActionButton } from '@/shared/ui/action-button';
+import { IconButton } from '@/shared/ui/icon-button';
+import { SelectRow } from '@/shared/ui/select-row';
+import { Badge } from '@/shared/ui/badge';
 
 /**
  * 시간 정하기 — 한 칼럼의 층위(헤드라인 → 달력 → 참석자 → 추천 → 확정)를
@@ -35,14 +40,14 @@ const WEEKDAY_SHORT = ['월', '화', '수', '목', '금', '토', '일'] as const
 
 /** 사람색 — 이 화면의 색은 종류가 아니라 사람이다("누가 언제 바쁜가").
  *  아바타 링과 타임라인 블록이 같은 색을 쓴다(자연 범례). 해시 배정 — 결정적. */
-const PERSON_PALETTE = ['#3AA3DA', '#3DAE74', '#E0704F', '#E0A82E', '#8F8C82', '#C56B8E', '#7E9A3C', '#A9805C'] as const;
+const PERSON_PALETTE = PERSON_COLORS;
 function personColor(id: string): string {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
   return PERSON_PALETTE[Math.abs(h) % PERSON_PALETTE.length];
 }
 /** 병합 점심(여러 사람 공동) — 누구의 색도 아니라 중립 회색. */
-const MERGED_COLOR = '#A4A4A4';
+const MERGED_COLOR = resolveColor('gray-400');
 
 /** 날짜 화법 — 가까운 날은 상대 표현(오늘·내일), 그 밖은 '7월 13일 (월)' 풀 포맷. */
 function fmtDayLabel(iso: string): string {
@@ -98,7 +103,7 @@ function WeekStrip({
   return (
     <div className="grid grid-cols-5 gap-y-2">
       {WEEKDAY_SHORT.slice(0, 5).map((w) => (
-        <span key={w} className="pb-0.5 text-center text-[12px] text-text-faint">
+        <span key={w} className="pb-0.5 text-center text-label text-faint">
           {w}
         </span>
       ))}
@@ -116,23 +121,23 @@ function WeekStrip({
                 aria-pressed={selected}
                 aria-label={`${fmtDayKorean(day)}${tone ? '' : ' — 후보 없음'}`}
                 onClick={() => onPick(day)}
-                className={`pressable relative mx-auto flex h-11 w-11 items-center justify-center rounded-[14px] text-[15px] font-semibold ${
+                className={`pressable relative mx-auto flex h-11 w-11 items-center justify-center rounded-r4 text-body-l font-semibold ${
                   selected
-                    ? 'bg-primary text-white shadow-[0_2px_10px_rgba(0,0,0,0.21)]'
+                    ? 'bg-ink text-on-ink shadow-s2'
                     : tone === 'ok'
-                      ? 'bg-primary-tint font-bold text-primary-pressed'
+                      ? 'bg-muted font-bold text-strong'
                       : tone === 'warn'
-                        ? 'bg-warn-bg font-bold text-warn-fg'
+                        ? 'bg-warning-weak font-bold text-warning'
                         : inWindow.has(day)
-                          ? 'text-text-faint'
-                          : 'text-border'
+                          ? 'text-faint'
+                          : 'text-disabled'
                 }`}
               >
                 {Number(day.slice(8, 10))}
                 {tone && !selected && (
                   <span
                     aria-hidden
-                    className={`absolute bottom-[5px] h-1 w-1 rounded-full ${tone === 'ok' ? 'bg-primary' : 'bg-warn-fg'}`}
+                    className={`absolute bottom-[5px] h-1 w-1 rounded-full ${tone === 'ok' ? 'bg-ink' : 'bg-warning'}`}
                   />
                 )}
               </button>
@@ -157,12 +162,12 @@ function AttendeeLine({ attendees, desktop }: { attendees: Attendee[]; desktop: 
         <div key={a.id} className="flex min-h-[52px] items-center gap-3 py-1.5">
           <Avatar person={a} size={32} />
           <span aria-hidden className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: personColor(a.id) }} />
-          <span className="text-[15px] font-medium text-text-strong">{a.name}</span>
-          {a.isOrganizer && <span className="text-[12px] text-text-weak">나 · 주최자</span>}
+          <span className="text-body-l font-medium text-strong">{a.name}</span>
+          {a.isOrganizer && <span className="text-label text-muted">나 · 주최자</span>}
           {/* 셋업과 같은 필 문법 — 보기 전용(여기선 조건을 바꾸지 않는다) */}
           <span
-            className={`ml-auto rounded-full px-2.5 py-1.5 text-[12px] font-semibold ${
-              a.attendanceType === 'required' ? 'bg-primary-tint text-primary' : 'bg-section text-text-weak'
+            className={`ml-auto rounded-full px-2.5 py-1.5 text-label font-semibold ${
+              a.attendanceType === 'required' ? 'bg-muted text-strong' : 'bg-subtle text-muted'
             }`}
           >
             {a.attendanceType === 'required' ? '꼭 참석' : '선택'}
@@ -179,8 +184,8 @@ function AttendeeLine({ attendees, desktop }: { attendees: Attendee[]; desktop: 
         aria-expanded={desktop ? open : sheetOpen}
         className="flex min-h-[48px] w-full items-center gap-2.5 py-2 text-left"
       >
-        <span className="text-[14px] font-semibold text-text-strong">
-          참석자 <span className="text-primary">{attendees.length}명</span>
+        <span className="text-body font-semibold text-strong">
+          참석자 <span className="text-strong">{attendees.length}명</span>
         </span>
         <span className="flex pl-1">
           {shown.map((a) => (
@@ -194,7 +199,7 @@ function AttendeeLine({ attendees, desktop }: { attendees: Attendee[]; desktop: 
               {a.attendanceType === 'required' && (
                 <span
                   aria-hidden
-                  className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#1F7A4B] text-[7px] font-black text-white ring-2 ring-white"
+                  className="absolute -bottom-0.5 -right-0.5 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-positive text-micro font-black text-on-ink ring-2 ring-page"
                 >
                   ✓
                 </span>
@@ -202,7 +207,7 @@ function AttendeeLine({ attendees, desktop }: { attendees: Attendee[]; desktop: 
             </span>
           ))}
           {extra > 0 && (
-            <span className="-ml-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-section text-[11px] font-semibold text-text-weak ring-2 ring-white">
+            <span className="-ml-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-subtle text-caption font-semibold text-muted ring-2 ring-page">
               +{extra}
             </span>
           )}
@@ -211,11 +216,11 @@ function AttendeeLine({ attendees, desktop }: { attendees: Attendee[]; desktop: 
           <ChevronDown
             size={15}
             aria-hidden
-            className={`ml-auto shrink-0 text-text-faint transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+            className={`ml-auto shrink-0 text-faint transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           />
         ) : (
           /* 시트를 여는 행 — 펼침(⌄)이 아니라 층 이동(›)의 어포던스. */
-          <ChevronRight size={15} aria-hidden className="ml-auto shrink-0 text-text-faint" />
+          <ChevronRight size={15} aria-hidden className="ml-auto shrink-0 text-faint" />
         )}
       </button>
       {desktop && open && rows}
@@ -239,40 +244,30 @@ function SlotRow({
   onSelect: () => void;
 }) {
   return (
-    /* 선택 행 — 배경 없이, 오른쪽 체크가 선택을 말한다. */
-    <button
-      type="button"
-      onClick={onSelect}
-      aria-pressed={selected}
-      className="pressable -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-section/60"
-    >
-      <span className="min-w-0 flex-1">
-        <span className="flex items-center gap-1.5">
-          <span className="truncate text-[15px] font-bold tracking-[-0.01em] text-text-strong">
-            {fmtDayLabel(slot.day)} {fmtTime(slot.start)}
-          </span>
-          {badge}
-        </span>
-        <span className="mt-0.5 block truncate text-[12px] leading-[1.5] text-text-weak">{cardReason(slot)}</span>
-      </span>
-      <Check
-        size={22}
-        strokeWidth={3}
-        aria-hidden
-        className={`shrink-0 transition-colors ${selected ? 'text-primary' : 'text-[#DADADA]'}`}
-      />
-    </button>
+    <SelectRow
+      title={`${fmtDayLabel(slot.day)} ${fmtTime(slot.start)}`}
+      sub={cardReason(slot)}
+      selected={selected}
+      badge={badge}
+      onSelect={onSelect}
+    />
   );
 }
 
 const BADGE_REC = (
-  <span className="shrink-0 rounded-lg bg-primary-tint px-2 py-1 text-[11px] font-bold text-primary">추천</span>
+  <Badge tone="rec" size="sm">
+    추천
+  </Badge>
 );
 const BADGE_PARTIAL = (
-  <span className="shrink-0 rounded-lg bg-[#DDF0FB] px-2 py-1 text-[11px] font-bold text-[#136A99]">부분</span>
+  <Badge tone="info" size="sm">
+    부분
+  </Badge>
 );
 const BADGE_WARN = (
-  <span className="shrink-0 rounded-lg bg-warn-bg px-2 py-1 text-[11px] font-bold text-warn-fg">아쉬움</span>
+  <Badge tone="warn" size="sm">
+    아쉬움
+  </Badge>
 );
 
 function badgeOf(slot: CandidateSlot, recommended: boolean): ReactNode {
@@ -297,13 +292,13 @@ function SuggestionRows({
           key={`${s.kind}:${s.targetId ?? ''}`}
           type="button"
           onClick={() => onPick(s)}
-          className="pressable flex w-full items-center gap-3 rounded-2xl bg-[#F8F8F8] px-4 py-3.5 text-left hover:bg-section"
+          className="pressable flex w-full items-center gap-3 rounded-r5 bg-faint px-4 py-3.5 text-left hover:bg-subtle"
         >
           <span className="min-w-0 flex-1">
-            <span className="block text-[14px] font-semibold leading-[1.4] text-text-strong">{s.label}</span>
-            <span className="mt-0.5 block text-[12px] leading-[1.4] text-text-weak">{s.resultSummary}</span>
+            <span className="block text-body font-semibold leading-snug text-strong">{s.label}</span>
+            <span className="mt-0.5 block text-label leading-snug text-muted">{s.resultSummary}</span>
           </span>
-          <ChevronRight size={16} aria-hidden className="shrink-0 text-text-faint" />
+          <ChevronRight size={16} aria-hidden className="shrink-0 text-faint" />
         </button>
       ))}
     </div>
@@ -416,7 +411,7 @@ function OverlapTimeline({
           <span
             key={h}
             aria-hidden
-            className="absolute left-0 w-8 -translate-y-2 text-right text-[10px] leading-4 text-text-faint"
+            className="absolute left-0 w-8 -translate-y-2 text-right text-caption-s leading-4 text-faint"
             style={{ top: y(h) }}
           >
             {hour <= 12 ? `${hour}시` : `${hour - 12}시`}
@@ -433,7 +428,7 @@ function OverlapTimeline({
             /* 텍스트 없이 색으로만 — 사람색 반투명(뒤가 비쳐 겹침이 읽힌다). 궁금하면 호버(툴팁). */
             <div
               key={item.key}
-              className="group absolute rounded-[10px]"
+              className="group absolute rounded-r3"
               style={{
                 top: y(item.start) + 2,
                 height: Math.max(h - 5, 10),
@@ -442,7 +437,7 @@ function OverlapTimeline({
                 backgroundColor: `${item.color}59`,
               }}
             >
-              <span className="pointer-events-none absolute -top-7 left-1 z-20 hidden whitespace-nowrap rounded-lg bg-[#3C3C3C] px-2 py-1 text-[11px] font-medium text-white shadow-[0_4px_12px_rgba(30,30,30,0.25)] group-hover:block">
+              <span className="pointer-events-none absolute -top-7 left-1 z-20 hidden whitespace-nowrap rounded-r2 bg-ink-soft px-2 py-1 text-caption font-medium text-on-ink shadow-s2 group-hover:block">
                 {item.title}
                 {item.owner ? ` · ${item.owner}` : ''}
               </span>
@@ -461,14 +456,14 @@ function OverlapTimeline({
             transition={reduced ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
             aria-label={`${fmtTime(g.start)} 후보 선택`}
             onClick={() => onPick(g)}
-            className="group/ghost absolute inset-x-0 z-[5] flex flex-col items-start justify-start rounded-[10px] border-[1.5px] border-dashed border-[#3AA3DA]/60 bg-[#3AA3DA]/[0.08] px-3.5 py-2 text-left transition-all duration-200 hover:z-20 hover:border-transparent hover:bg-primary hover:shadow-[0_4px_14px_rgba(0,0,0,0.21)]"
+            className="group/ghost absolute inset-x-0 z-[5] flex flex-col items-start justify-start rounded-r3 border-[1.5px] border-dashed border-sky-500/60 bg-sky-500/[0.08] px-3.5 py-2 text-left transition-all duration-200 hover:z-20 hover:border-transparent hover:bg-ink hover:shadow-s2"
             style={{ top: y(g.start) + 2, height: Math.max(y(g.end) - y(g.start) - 5, 20) }}
           >
             {/* 솔리드 카드와 같은 순서 — 제목 먼저, 시간 아래. */}
-            <span className="block truncate text-[13px] font-bold text-[#136A99] transition-colors group-hover/ghost:text-white">
+            <span className="block truncate text-body-s font-bold text-sky-800 transition-colors group-hover/ghost:text-on-ink">
               {meetingTitle}
             </span>
-            <span className="block text-[11px] font-medium text-[#4A93BD] transition-colors group-hover/ghost:text-white/85">
+            <span className="block text-caption font-medium text-sky-600 transition-colors group-hover/ghost:text-on-ink/85">
               {fmtTime(g.start)} – {fmtTime(g.end)}
             </span>
           </motion.button>
@@ -483,12 +478,12 @@ function OverlapTimeline({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={reduced ? { duration: 0 } : { duration: 0.22, ease: 'easeOut' }}
-            className="absolute inset-x-0 z-10 rounded-[10px] bg-primary px-3.5 py-2 text-white shadow-[0_4px_14px_rgba(0,0,0,0.21)]"
+            className="absolute inset-x-0 z-10 rounded-r3 bg-ink px-3.5 py-2 text-on-ink shadow-s2"
             style={{ top: y(slot.start) + 2, height: Math.max(y(slot.end) - y(slot.start) - 5, 20) }}
           >
             {/* 홈 카드와 같은 순서 — 제목이 먼저, 시간이 아래(단일 문법). */}
-            <p className="truncate text-[14px] font-bold leading-[1.35]">{meetingTitle}</p>
-            <p className="mt-0.5 text-[11.5px] font-medium leading-[1.35] opacity-85">
+            <p className="truncate text-body font-bold leading-snug">{meetingTitle}</p>
+            <p className="mt-0.5 text-label font-medium leading-snug opacity-85">
               {fmtTime(slot.start)} – {fmtTime(slot.end)}
             </p>
           </motion.div>
@@ -630,19 +625,17 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
     dispatch({ type: 'SET_STEP', step: 'confirm' });
   };
   const cta = active && (
-    <button
-      type="button"
+    <ActionButton size="lg" fullWidth
       onClick={confirm}
-      className="pressable h-[54px] w-full rounded-2xl bg-primary text-[16px] font-semibold text-white active:bg-primary-pressed"
     >
       이 시간으로 잡을게요
-    </button>
+    </ActionButton>
   );
 
   const [timelineOpen, setTimelineOpen] = useState(false);
 
   return (
-    <div className="min-h-dvh bg-bg pb-32 lg:pb-12">
+    <div className="min-h-dvh bg-page pb-32 lg:pb-12">
       {/* 데스크톱 헤더 — 셋업·홈과 같은 워드마크 틀 */}
       <div className="relative hidden lg:block">
         <div className="relative mx-auto max-w-[1200px] px-6 py-4">
@@ -655,24 +648,23 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
       {/* 뒤로가기 줄 — 조건을 바꾸고 싶으면 뒤로(셋업). 조건 수정 UI는 여기 없다. */}
       <FrostedBar innerClassName="mx-auto max-w-[520px] px-4 lg:max-w-[1200px] lg:px-6">
         <Reveal as="header" className="-mx-1 flex h-14 items-center lg:mx-0">
-          <button
-            type="button"
+          <IconButton
             onClick={() => dispatch({ type: 'SET_STEP', step: 'setup' })}
             aria-label="뒤로"
-            className="pressable -ml-2 flex h-10 w-10 items-center justify-center rounded-full text-text-strong hover:bg-section"
+            className="-ml-2"
           >
             <ChevronLeft size={22} aria-hidden />
-          </button>
+          </IconButton>
         </Reveal>
       </FrostedBar>
 
       <div className="mx-auto max-w-[520px] px-4 lg:max-w-[1200px] lg:px-6 lg:pt-2">
         <div className="lg:mx-auto lg:max-w-[920px] lg:px-4">
           <Reveal delay={70} className="pt-3 lg:pt-0">
-            <h1 className="whitespace-pre-line text-[22px] font-bold leading-[1.35] tracking-[-0.02em] text-text-strong">
+            <h1 className="whitespace-pre-line text-heading font-bold tracking-tight text-strong">
               {headline}
             </h1>
-            <p className="mt-1.5 break-keep text-[13px] leading-[1.5] text-text-weak">{sub}</p>
+            <p className="mt-1.5 break-keep text-body-s leading-normal text-muted">{sub}</p>
           </Reveal>
 
           {empty ? (
@@ -682,7 +674,7 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
                 {showSuggestions ? (
                   <SuggestionRows suggestions={suggestions} onPick={pickSuggestion} />
                 ) : (
-                  <p className="rounded-2xl bg-[#F8F8F8] px-4 py-3.5 text-[13px] leading-[1.6] text-text-weak">
+                  <p className="rounded-r5 bg-faint px-4 py-3.5 text-body-s leading-loose text-muted">
                     뒤로 가서 참석자나 회의 길이를 바꿔 주시면 바로 다시 찾아볼게요.
                   </p>
                 )}
@@ -701,14 +693,14 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
                   selectedDay={active?.day ?? null}
                   onPick={pickDay}
                 />
-                <p className="mt-3.5 flex items-center justify-center gap-1.5 text-[12px] text-text-weak lg:justify-start lg:pl-1">
-                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${allWarning ? 'bg-warn-fg' : 'bg-primary'}`} />
+                <p className="mt-3.5 flex items-center justify-center gap-1.5 text-label text-muted lg:justify-start lg:pl-1">
+                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${allWarning ? 'bg-warning' : 'bg-ink'}`} />
                   {allWarning ? '아쉬운 대로 가능한 날이에요' : '추천이 있는 날이에요 — 눌러서 둘러보세요'}
                 </p>
               </Reveal>
 
               <Reveal delay={210} className="pt-7 lg:col-start-1 lg:row-start-2">
-                <p className="text-[14px] font-semibold text-text-strong">
+                <p className="text-body font-semibold text-strong">
                   {dayFilter ? `${fmtDayKorean(dayFilter)}의 시간` : allWarning ? '그나마 나은 순이에요' : '추천 순이에요'}
                 </p>
                 <div className="mt-2.5 space-y-2">
@@ -728,7 +720,7 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
                   <button
                     type="button"
                     onClick={() => setDayFilter(null)}
-                    className="pressable mt-2.5 w-full rounded-xl py-2 text-center text-[13px] font-medium text-text-weak hover:bg-section/60"
+                    className="pressable mt-2.5 w-full rounded-r4 py-2 text-center text-body-s font-medium text-muted hover:bg-subtle/60"
                   >
                     전체 추천으로 돌아가기
                   </button>
@@ -738,7 +730,7 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
                       type="button"
                       onClick={() => setMoreOpen((o) => !o)}
                       aria-expanded={moreOpen}
-                      className="pressable mt-2.5 w-full rounded-xl py-2 text-center text-[13px] font-medium text-text-weak hover:bg-section/60"
+                      className="pressable mt-2.5 w-full rounded-r4 py-2 text-center text-body-s font-medium text-muted hover:bg-subtle/60"
                     >
                       {moreOpen ? '접기' : `다른 시간 ${moreCount}개 더 보기`}
                     </button>
@@ -747,11 +739,11 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
 
                 {/* 더 보기 — 날짜 그룹 + 시간 칩, 아쉬운 시간은 맨 아래(이유 동반) */}
                 {moreOpen && !dayFilter && (
-                  <div className="mt-2 space-y-4 rounded-2xl bg-[#FAFAFA] p-4">
+                  <div className="mt-2 space-y-4 rounded-r5 bg-faint p-4">
                     {!allWarning &&
                       restByDay.map(([day, arr]) => (
                         <div key={day}>
-                          <p className="text-[12px] font-semibold text-text-weak">{fmtDayKorean(day)}</p>
+                          <p className="text-label font-semibold text-muted">{fmtDayKorean(day)}</p>
                           <div className="mt-1.5 flex flex-wrap gap-1.5">
                             {arr.map((s) => (
                               <button
@@ -759,10 +751,10 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
                                 type="button"
                                 aria-pressed={active?.id === s.id}
                                 onClick={() => select(s)}
-                                className={`pressable rounded-xl px-3 py-2 text-[13px] font-semibold ${
+                                className={`pressable rounded-r4 px-3 py-2 text-body-s font-semibold ${
                                   active?.id === s.id
-                                    ? 'bg-primary text-white'
-                                    : 'bg-white text-text-body shadow-[0_1px_3px_rgba(30,30,30,0.06)] hover:bg-section'
+                                    ? 'bg-ink text-on-ink'
+                                    : 'bg-page text-default shadow-s1 hover:bg-subtle'
                                 }`}
                               >
                                 {fmtTime(s.start)}
@@ -790,7 +782,7 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
                 {/* 전부 아쉬울 때만 — 완화 제안이 본문에 함께 선다(상태 B) */}
                 {allWarning && showSuggestions && (
                   <div className="mt-5">
-                    <p className="text-[14px] font-semibold text-text-strong">이렇게 풀 수도 있어요</p>
+                    <p className="text-body font-semibold text-strong">이렇게 풀 수도 있어요</p>
                     <div className="mt-2.5">
                       <SuggestionRows suggestions={suggestions} onPick={pickSuggestion} />
                     </div>
@@ -811,10 +803,10 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
                     <button
                       type="button"
                       onClick={() => setTimelineOpen(true)}
-                      className="pressable flex min-h-[48px] w-full items-center justify-between rounded-xl py-3 text-[14px] font-semibold text-text-strong lg:hidden"
+                      className="pressable flex min-h-[48px] w-full items-center justify-between rounded-r4 py-3 text-body font-semibold text-strong lg:hidden"
                     >
                       {fmtDayKorean(active.day)} 모두의 일정
-                      <ChevronRight size={15} aria-hidden className="text-text-faint" />
+                      <ChevronRight size={15} aria-hidden className="text-faint" />
                     </button>
                     <MobileSheet
                       open={timelineOpen}
@@ -838,7 +830,7 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
 
                     {/* PC — 상시 노출(우측 전용 무대). */}
                     <div className="hidden lg:block">
-                      <p className="pb-6 text-[12px] leading-4 text-text-faint">
+                      <p className="pb-6 text-label leading-4 text-faint">
                         {fmtDayKorean(active.day)} 모두의 일정
                       </p>
                       <OverlapTimeline
@@ -871,7 +863,7 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
         >
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-white via-white/85 to-transparent"
+            className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-page via-page/85 to-transparent"
           />
           <div className="relative mx-auto max-w-[520px]">{cta}</div>
         </div>

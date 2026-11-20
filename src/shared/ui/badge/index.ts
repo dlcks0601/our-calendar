@@ -1,2 +1,1 @@
-export type { BadgeTone } from './Badge';
-export { default as Badge } from './Badge';
+export { BADGE_TONE_CLASS, badge, default as Badge, type BadgeProps, type BadgeTone } from './Badge';

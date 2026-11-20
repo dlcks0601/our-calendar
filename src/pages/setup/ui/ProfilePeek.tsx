@@ -6,6 +6,7 @@ import type { Person } from '@/entities/member';
 import { deriveInsights } from '@/features/schedule-meeting';
 import { fmtRange, weekdayIndex } from '@/shared/lib/time';
 import { eventsOn, KIND_STYLE } from '@/entities/event';
+import { resolveColor } from '@/shared/tokens';
 
 /**
  * 프로필 피크('다' 안) — 헤더 없음. 참석자 행 아래 인라인(모바일)/행 옆 팝오버(데스크톱).
@@ -67,7 +68,7 @@ function PeekBody({ person, windowDays }: { person: Person; windowDays: string[]
           const isSel = day === selDay;
           // 색 = 바쁨의 밀도(범례 없이 읽힌다): 개수 따라 회색 → 연분홍 → 분홍으로 데워진다.
           // 외근 여부는 색으로 숨기지 않는다 — 탭한 날 상세와 각주 문장이 글로 말한다.
-          const dotColor = items.length >= 3 ? '#000000' : items.length === 2 ? '#8C8C8C' : '#B7B7B7';
+          const dotColor = resolveColor(items.length >= 3 ? 'gray-1000' : items.length === 2 ? 'gray-500' : 'gray-400');
           return (
             <button
               key={day}
@@ -78,12 +79,12 @@ function PeekBody({ person, windowDays }: { person: Person; windowDays: string[]
               className="flex flex-1 flex-col items-center gap-1 py-1.5"
             >
               {/* 선택 = 홈 캘린더 데이 칩 문법 — 요일 파랑 + 숫자 파란 원 */}
-              <span className={`text-[10px] leading-none ${isSel ? 'font-semibold text-primary' : 'text-text-weak'}`}>
+              <span className={`text-caption-s leading-none ${isSel ? 'font-semibold text-strong' : 'text-muted'}`}>
                 {WEEKDAY_SHORT[weekdayIndex(day)]}
               </span>
               <span
-                className={`flex h-6 w-6 items-center justify-center rounded-full text-[13px] font-semibold leading-none transition-colors ${
-                  isSel ? 'bg-primary text-white' : 'text-text-body'
+                className={`flex h-6 w-6 items-center justify-center rounded-full text-body-s font-semibold leading-none transition-colors ${
+                  isSel ? 'bg-ink text-on-ink' : 'text-default'
                 }`}
               >
                 {Number(day.slice(8, 10))}
@@ -103,7 +104,7 @@ function PeekBody({ person, windowDays }: { person: Person; windowDays: string[]
           바 색은 홈 캘린더 KIND_STYLE과 단일 소스 — "이 사람의 캘린더 요약"이라는 서사가 이어진다. */}
       <div className="mt-3">
         {selected.length === 0 ? (
-          <p className="py-1 text-[12px] leading-[1.4] text-text-faint">일정 없음 — 하루가 비어 있어요</p>
+          <p className="py-1 text-label leading-snug text-faint">일정 없음 — 하루가 비어 있어요</p>
         ) : (
           <ul className="space-y-3">
             {selected.map((ev) => (
@@ -115,8 +116,8 @@ function PeekBody({ person, windowDays }: { person: Person; windowDays: string[]
                   style={{ backgroundColor: KIND_STYLE[ev.kind].bar }}
                 />
                 <div className="min-w-0">
-                  <p className="truncate text-[13px] font-semibold leading-[1.4] text-text-strong">{ev.title}</p>
-                  <p className="mt-px truncate text-[12px] leading-[1.4] text-text-weak">
+                  <p className="truncate text-body-s font-semibold leading-snug text-strong">{ev.title}</p>
+                  <p className="mt-px truncate text-label leading-snug text-muted">
                     {fmtRange(ev.start, ev.end)}
                     {ev.room ? ` · ${ev.room}` : ''}
                   </p>
@@ -129,7 +130,7 @@ function PeekBody({ person, windowDays }: { person: Person; windowDays: string[]
 
       {/* 인사이트 — 각주가 아니라 시스템이 읽어낸 발견. 추천 이유 칩(tradeoff 틴트)과 같은 목소리. */}
       {headline && (
-        <p className="mt-3 rounded-[10px] bg-primary-tint px-3 py-2 text-[12px] font-semibold leading-[1.45] text-primary break-keep">
+        <p className="mt-3 rounded-r3 bg-muted px-3 py-2 text-label font-semibold leading-snug text-strong break-keep">
           {headline}
         </p>
       )}
@@ -150,7 +151,7 @@ export default function ProfilePeek({ person, windowDays, mode = 'auto', action 
       transition={{ duration: dur, ease: 'easeOut' }}
       className={`overflow-hidden ${mode === 'auto' ? 'lg:hidden' : ''}`}
     >
-      <div className="mb-2 mt-1 rounded-2xl bg-section p-3.5">
+      <div className="mb-2 mt-1 rounded-r5 bg-subtle p-3.5">
         <PeekBody person={person} windowDays={windowDays} />
         {action && <div className="mt-3">{action}</div>}
       </div>
@@ -169,7 +170,7 @@ export default function ProfilePeek({ person, windowDays, mode = 'auto', action 
         exit={{ opacity: 0, scale: 0.97, x: -4 }}
         transition={{ duration: dur, ease: 'easeOut' }}
         style={{ transformOrigin: 'left center' }}
-        className="absolute left-full top-0 z-30 ml-4 hidden w-[320px] rounded-2xl bg-white p-3.5 shadow-[0_12px_40px_rgba(30,30,30,0.12),0_2px_8px_rgba(30,30,30,0.06)] ring-1 ring-border/60 lg:block"
+        className="absolute left-full top-0 z-30 ml-4 hidden w-[320px] rounded-r5 bg-page p-3.5 shadow-s4 ring-1 ring-default/60 lg:block"
       >
         <PeekBody person={person} windowDays={windowDays} />
       </motion.div>

@@ -33,12 +33,12 @@ export interface ScanMomentProps {
  *  각 색이 코너 하나씩을 소유하고 이음새에서만 섞인다 — 전부 겹치면 색이 죽는다(머디 워시 금지).
  *  가운데는 가장 밝게 남아 검정 헤드라인의 자리가 된다. */
 const BLOBS = [
-  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-[#D3EAF8] opacity-60',
-  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-[#D8F0E0] opacity-55',
-  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-[#FADFD5] opacity-55',
-  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-[#FAEBC8] opacity-55',
+  'scan-blob-a left-[-12%] top-[-18%] h-[52vmax] w-[52vmax] bg-sky-100 opacity-60',
+  'scan-blob-b right-[-10%] top-[-16%] h-[46vmax] w-[46vmax] bg-green-100 opacity-55',
+  'scan-blob-c bottom-[-22%] left-[-12%] h-[48vmax] w-[48vmax] bg-coral-100 opacity-55',
+  'scan-blob-d bottom-[-24%] right-[-12%] h-[50vmax] w-[50vmax] bg-yellow-100 opacity-55',
   // 가운데 — 코너 색들의 다리(연한 페리윙클). 헤드라인 가독을 지키는 가장 옅은 톤.
-  'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-[#E9E9E6] opacity-45',
+  'scan-blob-e left-[18%] top-[22%] h-[55vmax] w-[55vmax] bg-stone-100 opacity-45',
 ];
 
 export default function ScanMoment({ attendees, duration, onDone }: ScanMomentProps) {
@@ -66,7 +66,7 @@ export default function ScanMoment({ attendees, duration, onDone }: ScanMomentPr
     <Reveal className="w-full">
       <section
         aria-label={`${attendees.length}명의 다음 주를 읽는 중`}
-        className="relative flex min-h-dvh w-full overflow-hidden bg-bg"
+        className="relative flex min-h-dvh w-full overflow-hidden bg-page"
       >
         {/* 배경 — 파스텔 블롭 표류(은은하게, 각자 제 궤도로) */}
         <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -85,7 +85,7 @@ export default function ScanMoment({ attendees, duration, onDone }: ScanMomentPr
         </div>
 
         <div className="relative mx-auto flex w-full max-w-[420px] flex-col justify-center px-6 py-16">
-          <p className="text-[13px] font-semibold text-text-weak">
+          <p className="text-body-s font-semibold text-muted">
             {attendees.length}명의 다음 주를 읽는 중
           </p>
 
@@ -98,7 +98,7 @@ export default function ScanMoment({ attendees, duration, onDone }: ScanMomentPr
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute inset-0 truncate text-[24px] font-bold leading-[34px] tracking-[-0.02em] text-text-strong"
+                className="absolute inset-0 truncate text-heading-l font-bold leading-snug tracking-tight text-strong"
               >
                 {finale ? finalScanLine(duration) : '좋은 시간을 찾고 있어요'}
               </motion.h2>
@@ -118,7 +118,7 @@ export default function ScanMoment({ attendees, duration, onDone }: ScanMomentPr
                     <div className="relative h-[22px] w-[22px] shrink-0">
                       <span
                         aria-hidden
-                        className={`absolute inset-[7px] rounded-full bg-border transition-opacity duration-300 ${
+                        className={`absolute inset-[7px] rounded-full bg-muted transition-opacity duration-300 ${
                           active || done ? 'opacity-0' : 'opacity-100'
                         }`}
                       />
@@ -132,24 +132,24 @@ export default function ScanMoment({ attendees, duration, onDone }: ScanMomentPr
                           className="scan-halo absolute -inset-[7px] rounded-full"
                           style={{
                             background:
-                              'radial-gradient(circle, rgba(0,0,0,0.17), rgba(0,0,0,0.06) 55%, transparent 72%)',
+                              'radial-gradient(circle, color-mix(in srgb, var(--color-gray-1000) 17%, transparent), color-mix(in srgb, var(--color-gray-1000) 6%, transparent) 55%, transparent 72%)',
                           }}
                         />
-                        <span className="absolute inset-[6px] rounded-full bg-primary" />
+                        <span className="absolute inset-[6px] rounded-full bg-ink" />
                       </span>
                       <span
                         aria-hidden
-                        className={`absolute inset-[7px] rounded-full bg-primary transition-[opacity,transform] duration-300 ${
+                        className={`absolute inset-[7px] rounded-full bg-ink transition-[opacity,transform] duration-300 ${
                           done ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
                         }`}
                       />
                     </div>
                     {/* 레일 — 활성되는 순간부터 스텝 박자에 맞춰 파랑 필이 차오른다 */}
                     {!last && (
-                      <div className="relative my-[5px] min-h-[18px] w-[3px] flex-1 overflow-hidden rounded-full bg-section">
+                      <div className="relative my-[5px] min-h-[18px] w-[3px] flex-1 overflow-hidden rounded-full bg-subtle">
                         <span
                           aria-hidden
-                          className="absolute inset-0 origin-top rounded-full bg-gradient-to-b from-[#000000] to-[#9A9A9A]"
+                          className="absolute inset-0 origin-top rounded-full bg-gradient-to-b from-ink to-gray-500"
                           style={{
                             transform: 'scaleY(0)',
                             animation:
@@ -162,10 +162,10 @@ export default function ScanMoment({ attendees, duration, onDone }: ScanMomentPr
 
                   <div className={last ? '' : 'pb-6'}>
                     {/* 타이틀 이중 레이어 — 베이스(회색 상태들) 위에 시머 그라데이션이 활성 구간만 켜진다 */}
-                    <p className="relative mt-px text-[15.5px] font-bold leading-[1.4]">
+                    <p className="relative mt-px text-title-s font-bold leading-snug">
                       <span
                         className={`transition-colors duration-300 ${
-                          active ? 'text-transparent' : done ? 'text-text-weak' : 'text-text-faint'
+                          active ? 'text-transparent' : done ? 'text-muted' : 'text-faint'
                         }`}
                       >
                         {s.title}
@@ -181,7 +181,7 @@ export default function ScanMoment({ attendees, duration, onDone }: ScanMomentPr
                     </p>
                     {/* 설명 — 자리는 상시 확보(레일 길이 불변), 투명도로만 등장·퇴장 */}
                     <p
-                      className={`mt-[5px] text-[13px] leading-[1.5] text-[#8C8C8C] transition-opacity duration-300 ${
+                      className={`mt-[5px] text-body-s leading-normal text-muted transition-opacity duration-300 ${
                         active ? 'opacity-100' : 'opacity-0'
                       }`}
                     >

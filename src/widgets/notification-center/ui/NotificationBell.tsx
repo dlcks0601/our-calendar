@@ -7,6 +7,8 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { NOTIFICATION_KIND_STYLE } from './ToastStack';
 import { useIsDesktop } from '@/shared/lib/hooks';
 import type { AppNotification } from '../model/types';
+import { SPRING } from '@/shared/tokens';
+import { IconButton } from '@/shared/ui/icon-button';
 
 /**
  * 알림 벨 — 헤더의 벨을 탭하면 데스크톱은 제자리 드롭다운, 모바일은 알림 페이지
@@ -40,7 +42,7 @@ export function NotificationList({
   onSelectInvite?: (n: AppNotification) => void;
 }) {
   if (list.length === 0) {
-    return <p className="py-10 text-center text-[13px] text-text-faint">알림이 없어요</p>;
+    return <p className="py-10 text-center text-body-s text-faint">알림이 없어요</p>;
   }
   return (
     <ul className="space-y-0.5">
@@ -53,8 +55,8 @@ export function NotificationList({
         );
         const body = (
           <>
-            <p className="min-w-0 flex-1 text-[13px] font-medium leading-[1.45] text-text-strong break-keep">{n.text}</p>
-            <span className="shrink-0 text-[11px] text-text-faint">{relativeTimeLabel(now - n.at)}</span>
+            <p className="min-w-0 flex-1 text-body-s font-medium leading-snug text-strong break-keep">{n.text}</p>
+            <span className="shrink-0 text-caption text-faint">{relativeTimeLabel(now - n.at)}</span>
           </>
         );
         // invite 알림은 입구 — 행 전체가 버튼(셰브런)으로 초대 화면을 연다.
@@ -64,17 +66,17 @@ export function NotificationList({
               <button
                 type="button"
                 onClick={() => onSelectInvite(n)}
-                className="pressable flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left hover:bg-section"
+                className="pressable flex w-full items-center gap-3 rounded-r4 px-2 py-2.5 text-left hover:bg-subtle"
               >
                 {icon}
                 {body}
-                <ChevronRight size={15} className="shrink-0 text-text-faint" aria-hidden />
+                <ChevronRight size={15} className="shrink-0 text-faint" aria-hidden />
               </button>
             </li>
           );
         }
         return (
-          <li key={n.id} className="flex items-center gap-3 rounded-xl px-2 py-2.5">
+          <li key={n.id} className="flex items-center gap-3 rounded-r4 px-2 py-2.5">
             {icon}
             {body}
           </li>
@@ -136,12 +138,11 @@ export default function NotificationBell({ list = [], unreadCount, onOpen, onSel
 
   return (
     <div className="relative">
-      <button
-        type="button"
+      <IconButton
         onClick={toggle}
         aria-expanded={open}
         aria-label={unreadCount > 0 ? `알림 — 안 읽음 ${unreadCount}개` : '알림'}
-        className="pressable relative flex h-10 w-10 items-center justify-center rounded-full text-text-strong hover:bg-section"
+        className="relative"
       >
         <HiBell size={22} aria-hidden />
         <AnimatePresence>
@@ -152,12 +153,12 @@ export default function NotificationBell({ list = [], unreadCount, onOpen, onSel
               initial={reduced ? { opacity: 0 } : { scale: 0 }}
               animate={reduced ? { opacity: 1 } : { scale: 1 }}
               exit={reduced ? { opacity: 0 } : { scale: 0 }}
-              transition={reduced ? { duration: 0.1 } : { type: 'spring', stiffness: 500, damping: 18 }}
-              className="absolute right-[9px] top-[9px] h-2 w-2 rounded-full bg-alert ring-2 ring-white"
+              transition={reduced ? { duration: 0.1 } : SPRING.pop}
+              className="absolute right-[9px] top-[9px] h-2 w-2 rounded-full bg-alert ring-2 ring-page"
             />
           )}
         </AnimatePresence>
-      </button>
+      </IconButton>
 
       <AnimatePresence>
         {open && desktop && (
@@ -180,11 +181,11 @@ export default function NotificationBell({ list = [], unreadCount, onOpen, onSel
               initial={reduced ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
               animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
               exit={reduced ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
-              transition={reduced ? { duration: 0.15 } : { type: 'spring', stiffness: 350, damping: 30 }}
+              transition={reduced ? { duration: 0.15 } : SPRING.position}
               style={{ transformOrigin: 'top right' }}
-              className="absolute right-0 top-12 z-[80] w-[340px] rounded-card bg-white p-3 shadow-[0_16px_40px_rgba(30,30,30,0.14),0_2px_8px_rgba(30,30,30,0.06)] ring-1 ring-border/60"
+              className="absolute right-0 top-12 z-[80] w-[340px] rounded-r5 bg-page p-3 shadow-s4 ring-1 ring-default/60"
             >
-              <h2 className="px-2 pb-1.5 pt-1 text-[14px] font-bold text-text-strong">알림</h2>
+              <h2 className="px-2 pb-1.5 pt-1 text-body font-bold text-strong">알림</h2>
               <div className="max-h-[380px] overflow-y-auto">
                 <NotificationList list={list} now={now} onSelectInvite={selectInvite} />
               </div>

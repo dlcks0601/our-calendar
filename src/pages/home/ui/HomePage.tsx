@@ -1,7 +1,6 @@
 'use client';
 
 import type { Dispatch } from 'react';
-import { FrostedBar } from '@/shared/ui/frosted-bar';
 import HomeCalendar, { type ResponseBadges } from './HomeCalendar';
 import { NotificationBell, type AppNotification } from '@/widgets/notification-center';
 import { Reveal } from '@/shared/ui/reveal';
@@ -9,6 +8,7 @@ import { Wordmark } from '@/shared/ui/wordmark';
 import { useScrollProgress } from '@/shared/lib/hooks';
 import { type Action, type AppState, INCOMING_INVITE } from '@/features/schedule-meeting';
 import { ME_ID, ORG } from '@/entities/member';
+import { ActionButton } from '@/shared/ui/action-button';
 
 const ME = ORG.find((p) => p.id === ME_ID)!;
 
@@ -42,27 +42,25 @@ export default function HomePage({
   const invitePending = state.inviteResponded === null;
 
   return (
-    <div className="relative min-h-dvh bg-bg pb-32 lg:pb-16">
+    <div className="relative min-h-dvh bg-page pb-32 lg:pb-16">
 
       {/* 헤더 — 스크롤 연동 베일(FrostedBar와 같은 문법). 정지 상태 = 완전 투명. */}
       <div className="sticky top-0 z-50">
         <div
           aria-hidden
           style={{ opacity: headerVeil }}
-          className="pointer-events-none absolute inset-x-0 -bottom-12 top-0 bg-white/60 backdrop-blur-lg [mask-image:linear-gradient(to_bottom,black_40%,transparent)]"
+          className="pointer-events-none absolute inset-x-0 -bottom-12 top-0 bg-page/60 backdrop-blur-lg [mask-image:linear-gradient(to_bottom,black_40%,transparent)]"
         />
         <div className="relative mx-auto max-w-[1200px] px-4 py-3.5 lg:px-6 lg:py-4">
           <Reveal as="header" className="flex items-center justify-between">
             <Wordmark />
             <div className="flex items-center gap-2">
               {/* 데스크톱 CTA — frosted sticky 헤더 소속이라 스크롤을 따라오면서 콘텐츠를 가리지 않는다. */}
-              <button
-                type="button"
-                onClick={openSetup}
-                className="pressable hidden h-9 items-center rounded-[10px] bg-primary px-3 text-[14px] font-semibold text-white hover:bg-primary-pressed lg:inline-flex"
-              >
-                일정 만들기
-              </button>
+              <span className="hidden lg:inline-flex">
+                <ActionButton size="sm" onClick={openSetup}>
+                  일정 만들기
+                </ActionButton>
+              </span>
               <NotificationBell
                 unreadCount={unreadCount}
                 list={notifications}
@@ -93,15 +91,14 @@ export default function HomePage({
         {/* 하단 frost — 헤더의 미러: 스크롤 콘텐츠가 반투명 너머로 흐릿하게 지나간다(경계 없음). */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-white via-white/85 to-transparent"
+          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-page via-page/85 to-transparent"
         />
-        <button
-          type="button"
+        <ActionButton size="lg" fullWidth
           onClick={openSetup}
-          className="pressable relative h-[54px] w-full rounded-2xl bg-primary text-[16px] font-semibold text-white active:bg-primary-pressed"
+          className="relative"
         >
           일정 만들기
-        </button>
+        </ActionButton>
       </div>
 
     </div>

@@ -1,1 +1,1 @@
-export { default as Chip } from './Chip';
+export { chip, default as Chip, type ChipProps } from './Chip';

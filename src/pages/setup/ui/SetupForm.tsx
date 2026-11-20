@@ -15,6 +15,9 @@ import { Reveal } from '@/shared/ui/reveal';
 import { isMeeting, type Action, type AppState, windowFor, type DeadlineKind } from '@/features/schedule-meeting';
 import { businessDaysFrom, fmtTime, type Minutes } from '@/shared/lib/time';
 import { ANCHOR_DATE } from '@/shared/config';
+import { SPRING } from '@/shared/tokens';
+import { ActionButton } from '@/shared/ui/action-button';
+import { IconButton } from '@/shared/ui/icon-button';
 
 /**
  * 셋업 — 하나의 폼, 모핑. "일정은 혼자면 결정, 사람이 생기면 협상이 된다"를 폼의 변형으로 말한다.
@@ -75,7 +78,7 @@ const TIME_OPTIONS: Minutes[] = Array.from({ length: 21 }, (_, i) => 540 + i * 3
 /** 모핑 한 호흡 — 450ms expo-out(디자인 토큰 --bezier-expo와 동일 곡선). */
 const MORPH = { duration: 0.45, ease: [0.16, 1, 0.3, 1] as const };
 /** 위치 이동 스프링 — 오버슈트 없는 {350, 30}(토스트와 동일 규칙). */
-const POSITION_SPRING = { type: 'spring' as const, stiffness: 350, damping: 30 };
+const POSITION_SPRING = SPRING.position;
 
 // ── 작은 조각들 ────────────────────────────────────────────────────
 
@@ -98,7 +101,7 @@ function FieldGroup({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.4, ease: MORPH.ease }}
     >
-      <p className="text-[14px] font-semibold text-text-strong">{label}</p>
+      <p className="text-body font-semibold text-strong">{label}</p>
       <div className="mt-2.5">{children}</div>
     </motion.div>
   );
@@ -157,7 +160,7 @@ function SoloFields({
             ariaLabel="시작 시간"
             options={TIME_OPTIONS.slice(0, -1).map((m) => ({ value: String(m), label: fmtTime(m) }))}
           />
-          <span className="text-[14px] text-text-weak" aria-hidden>
+          <span className="text-body text-muted" aria-hidden>
             –
           </span>
           <PickerField
@@ -234,37 +237,33 @@ function AttendeeRow({
     <div className="relative">
       <div className="flex items-center gap-3 py-2">
         <Avatar person={person} size={32} />
-        <span className="min-w-0 flex-1 truncate py-1 text-[15px] font-medium text-text-strong">
+        <span className="min-w-0 flex-1 truncate py-1 text-body-l font-medium text-strong">
           {person.name}
-          {isMe && <span className="ml-1.5 text-[12px] font-normal text-text-weak">나 · 주최자</span>}
+          {isMe && <span className="ml-1.5 text-label font-normal text-muted">나 · 주최자</span>}
         </span>
         {!isMe && (
           /* 꼭참석/선택 토글 필 — 탭하면 상태가 뒤집힌다. 회의 길이·기한 칩과 같은 모양(선택 = 검정 면)에
              위아래 화살표를 더해 누를 수 있는 영역임을 알린다(터치 기기에서는 화살표가 그 역할을 한다). */
-          <button
-            type="button"
+          <ActionButton
+            size="xs"
+            variant={required ? 'solid' : 'weak'}
             aria-pressed={required}
             aria-label={`${person.name} ${required ? '꼭 참석' : '선택 참석'}`}
             onClick={onPin}
-            className={`pressable group/pin inline-flex h-7 shrink-0 items-center gap-1 rounded-full pl-2.5 pr-1.5 text-[12px] transition-colors ${
-              required
-                ? 'bg-primary font-semibold text-white hover:bg-primary-pressed'
-                : 'bg-section font-medium text-text-body hover:bg-border/70'
-            }`}
+            className="group/pin"
           >
             {required ? '꼭 참석' : '선택'}
             <ChevronsUpDown size={12} aria-hidden className="opacity-45 transition-opacity group-hover/pin:opacity-100" />
-          </button>
+          </ActionButton>
         )}
         {!isMe && (
-          <button
-            type="button"
+          <IconButton size="xs" tone="faint"
             aria-label={`${person.name} 빼기`}
             onClick={onRemove}
-            className="pressable flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-text-faint transition-colors hover:bg-section hover:text-text-weak"
+            className="hover:text-muted"
           >
             <X size={15} aria-hidden />
-          </button>
+          </IconButton>
         )}
       </div>
     </div>
@@ -354,11 +353,9 @@ export default function SetupForm({ state, dispatch, onSaved }: SetupFormProps) 
 
   // CTA — 라벨 크로스페이드: 일정 만들기 ↔ 시간 찾아보기 (모바일 고정/데스크톱 인플로우 공용)
   const cta = (
-    <button
-      type="button"
+    <ActionButton size="lg" fullWidth
       onClick={submit}
       disabled={!meeting && !canSave}
-      className="pressable h-[54px] w-full rounded-2xl bg-primary text-[16px] font-semibold text-white transition-colors active:bg-primary-pressed disabled:bg-section disabled:text-text-faint"
     >
       <span className="grid">
         <span
@@ -374,12 +371,12 @@ export default function SetupForm({ state, dispatch, onSaved }: SetupFormProps) 
           시간 찾아보기
         </span>
       </span>
-    </button>
+    </ActionButton>
   );
 
   // pb: 모바일은 고정 CTA(≈94px) 위 여유, PC는 고정층이 없어 숨 쉴 틈 48px이면 충분.
   return (
-    <div className="min-h-dvh bg-bg pb-32 lg:pb-12">
+    <div className="min-h-dvh bg-page pb-32 lg:pb-12">
       {/* 데스크톱 헤더 — 홈과 같은 워드마크. 스텝이 바뀌어도 페이지 틀은 유지된다. */}
       <div className="relative hidden lg:block">
         <div className="relative mx-auto max-w-[1200px] px-6 py-4">
@@ -393,14 +390,13 @@ export default function SetupForm({ state, dispatch, onSaved }: SetupFormProps) 
       {/* 뒤로가기 줄 — 스크롤하면 frosted로 얼어붙는다(홈 헤더와 같은 문법). */}
       <FrostedBar innerClassName="mx-auto max-w-[520px] px-4 lg:max-w-[1200px] lg:px-6">
         <Reveal as="header" className="-mx-1 flex h-14 items-center lg:mx-0">
-          <button
-            type="button"
+          <IconButton
             onClick={goHome}
             aria-label="뒤로"
-            className="pressable -ml-2 flex h-10 w-10 items-center justify-center rounded-full text-text-strong hover:bg-section"
+            className="-ml-2"
           >
             <ChevronLeft size={22} aria-hidden />
-          </button>
+          </IconButton>
         </Reveal>
       </FrostedBar>
 
@@ -410,10 +406,10 @@ export default function SetupForm({ state, dispatch, onSaved }: SetupFormProps) 
         <div className="lg:mx-auto lg:max-w-[920px] lg:px-4">
 
         <Reveal delay={70} className="pt-3 lg:pt-0">
-          <h1 className="text-[22px] font-bold leading-[1.35] tracking-[-0.02em] text-text-strong">
+          <h1 className="text-heading font-bold tracking-tight text-strong">
             어떤 일정을 만들까요?
           </h1>
-          <p className="mt-1.5 break-keep text-[13px] leading-[1.5] text-text-weak">
+          <p className="mt-1.5 break-keep text-body-s leading-normal text-muted">
             혼자면 바로 캘린더에, 함께면 좋은 시간을 찾아드려요
           </p>
         </Reveal>
@@ -429,14 +425,14 @@ export default function SetupForm({ state, dispatch, onSaved }: SetupFormProps) 
             onChange={(e) => dispatch({ type: 'SET_TITLE', title: e.target.value })}
             placeholder={shownMeeting ? '주간 싱크' : KIND_PLACEHOLDER[kind]}
             aria-label="일정 제목"
-            className="w-full border-b-2 border-border bg-transparent py-2.5 text-[19px] font-semibold text-text-strong outline-none transition-colors placeholder:text-text-faint focus:border-primary"
+            className="w-full border-b-2 border-default bg-transparent py-2.5 text-title-l font-semibold text-strong outline-none transition-colors placeholder:text-faint focus:border-ink"
           />
         </Reveal>
 
         {/* 참석자 — lg에선 오른쪽 기둥(두 행 스팬), CTA까지 품는다 */}
         <Reveal delay={210} className="pt-7 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:pt-6">
-          <p className="text-[14px] font-semibold text-text-strong">
-            참석자 <span className="text-primary">{attendees.length}명</span>
+          <p className="text-body font-semibold text-strong">
+            참석자 <span className="text-strong">{attendees.length}명</span>
           </p>
           <div className="mt-1.5">
             {reduced ? (
@@ -477,15 +473,15 @@ export default function SetupForm({ state, dispatch, onSaved }: SetupFormProps) 
             <button
               type="button"
               onClick={() => setPicker({ open: true, wasMeeting: meeting })}
-              className="pressable -mx-2 flex w-[calc(100%+16px)] items-center gap-3 rounded-xl px-2 py-2 text-left hover:bg-section/60"
+              className="pressable -mx-2 flex w-[calc(100%+16px)] items-center gap-3 rounded-r4 px-2 py-2 text-left hover:bg-subtle/60"
             >
               <span
                 aria-hidden
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-dashed border-text-faint text-text-weak"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-dashed border-faint text-muted"
               >
                 <Plus size={15} strokeWidth={2.4} />
               </span>
-              <span className="text-[15px] font-medium text-primary">참석자 추가</span>
+              <span className="text-body-l font-medium text-strong">참석자 추가</span>
             </button>
 
             {/* PC: CTA가 참석자 바로 아래 — "이 사람들과 → 시간 찾아보기" 서사.
@@ -501,7 +497,7 @@ export default function SetupForm({ state, dispatch, onSaved }: SetupFormProps) 
                     transition={reduced ? { duration: 0 } : MORPH}
                     className="overflow-hidden"
                   >
-                    <p className="px-1 pt-1.5 text-[13px] leading-[1.5] text-text-faint">
+                    <p className="px-1 pt-1.5 text-body-s leading-normal text-faint">
                       함께할 사람을 더하면, 좋은 시간을 대신 찾아드려요
                     </p>
                   </motion.div>
@@ -558,7 +554,7 @@ export default function SetupForm({ state, dispatch, onSaved }: SetupFormProps) 
         {/* 하단 frost — 접히는 폼이 반투명 너머로 흐릿하게 지나간다. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-white via-white/85 to-transparent"
+          className="pointer-events-none absolute inset-x-0 -top-8 bottom-0 bg-gradient-to-t from-page via-page/85 to-transparent"
         />
         <div className="relative mx-auto max-w-[520px]">{cta}</div>
       </div>

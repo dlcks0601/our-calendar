@@ -57,10 +57,10 @@ describe('summaryLine — summarizeSlot 폴백 방어', () => {
 
 describe('REASON_TONE_CLASS', () => {
   it('positive grey100 / tradeoff 파랑 tint / warning warn-bg — 테두리 없는 언어', () => {
-    expect(REASON_TONE_CLASS.positive).toContain('bg-section');
+    expect(REASON_TONE_CLASS.positive).toContain('bg-subtle');
     expect(REASON_TONE_CLASS.positive).not.toContain('ring');
-    expect(REASON_TONE_CLASS.tradeoff).toContain('bg-primary-tint');
-    expect(REASON_TONE_CLASS.warning).toContain('bg-warn-bg');
-    expect(REASON_TONE_CLASS.warning).toContain('text-warn-fg');
+    expect(REASON_TONE_CLASS.tradeoff).toContain('bg-muted');
+    expect(REASON_TONE_CLASS.warning).toContain('bg-warning-weak');
+    expect(REASON_TONE_CLASS.warning).toContain('text-warning');
   });
 });

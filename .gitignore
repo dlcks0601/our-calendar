@@ -50,3 +50,6 @@ next-env.d.ts
 .playwright-mcp/
 .superpowers/
 /*.png
+
+# 시각 대조 캡처
+.visual/

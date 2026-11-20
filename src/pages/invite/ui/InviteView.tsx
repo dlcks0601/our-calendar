@@ -12,6 +12,9 @@ import { useIsDesktop } from '@/shared/lib/hooks';
 import { REASON_TONE_CLASS, REASON_STAGGER_MS, activeMitigations, adjustedRange, fmtDuration, useCandidates, type Action, type AppState, INCOMING_INVITE } from '@/features/schedule-meeting';
 import { fmtDayKorean, fmtRange, type Minutes } from '@/shared/lib/time';
 import type { CandidateSlot, SlotReason } from '@/entities/slot';
+import { SPRING } from '@/shared/tokens';
+import { ActionButton } from '@/shared/ui/action-button';
+import { IconButton } from '@/shared/ui/icon-button';
 
 /**
  * 초대 뷰(step 'invite') — 여정 B의 본체이자, 여정 A의 마지막 거울.
@@ -127,8 +130,8 @@ function ReasonRows({ reasons, highlightIndex, animated }: { reasons: SlotReason
           initial={animated ? { opacity: 0, y: 6 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: animated ? (i * REASON_STAGGER_MS) / 1000 : 0, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className={`rounded-[10px] px-3 py-2 text-[13px] leading-[1.45] break-keep ${
-            i === highlightIndex ? 'bg-primary-tint font-semibold text-primary' : REASON_TONE_CLASS[r.tone]
+          className={`rounded-r3 px-3 py-2 text-body-s leading-snug break-keep ${
+            i === highlightIndex ? 'bg-muted font-semibold text-strong' : REASON_TONE_CLASS[r.tone]
           }`}
         >
           {r.text}
@@ -138,7 +141,7 @@ function ReasonRows({ reasons, highlightIndex, animated }: { reasons: SlotReason
   );
 }
 
-const POP_SPRING = { type: 'spring' as const, stiffness: 500, damping: 18 };
+const POP_SPRING = SPRING.pop;
 
 // ── 본체 ────────────────────────────────────────────────────────────
 
@@ -201,18 +204,16 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
   if (!model) {
     return (
       <main className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col items-center justify-center gap-5 px-4">
-        <Reveal className="w-full rounded-card bg-section px-6 py-12 text-center">
-          <p className="text-[15px] font-semibold text-text-strong">미리 볼 초대가 없어요</p>
-          <p className="mt-1.5 text-[13px] leading-[1.5] text-text-weak">조건이 바뀌었나 봐요 — 홈에서 다시 시작해 주세요</p>
+        <Reveal className="w-full rounded-r5 bg-subtle px-6 py-12 text-center">
+          <p className="text-body-l font-semibold text-strong">미리 볼 초대가 없어요</p>
+          <p className="mt-1.5 text-body-s leading-normal text-muted">조건이 바뀌었나 봐요 — 홈에서 다시 시작해 주세요</p>
         </Reveal>
         <Reveal delay={70}>
-          <button
-            type="button"
+          <ActionButton variant="weak" pill
             onClick={goHome}
-            className="pressable inline-flex h-11 items-center rounded-full bg-section px-5 text-[14px] font-semibold text-text-body transition-colors hover:bg-[#F1F1F1]"
           >
             홈으로
-          </button>
+          </ActionButton>
         </Reveal>
       </main>
     );
@@ -230,7 +231,7 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
   };
 
   return (
-    <main className="min-h-dvh bg-bg pb-16">
+    <main className="min-h-dvh bg-page pb-16">
       {/* 데스크톱 헤더 — 홈·셋업·확정과 같은 워드마크 틀(스텝이 바뀌어도 유지). */}
       <div className="relative hidden lg:block">
         <div className="relative mx-auto max-w-[1200px] px-6 py-4">
@@ -243,14 +244,13 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
       {/* 헤더 — ← 은 home 고정(binding 1). 상시 frost(전 화면 공통 문법). */}
       <FrostedBar innerClassName="mx-auto w-full max-w-[560px] px-4">
         <Reveal as="header" className="-mx-1 flex h-14 items-center">
-          <button
-            type="button"
+          <IconButton
             onClick={goHome}
             aria-label="홈으로"
-            className="pressable -ml-2 flex h-10 w-10 items-center justify-center rounded-full text-text-strong hover:bg-section"
+            className="-ml-2"
           >
             <ChevronLeft size={22} aria-hidden />
-          </button>
+          </IconButton>
         </Reveal>
       </FrostedBar>
       <div className="mx-auto w-full max-w-[560px] px-4">
@@ -258,31 +258,31 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
         {/* 관점 배너 — preview 전용(grey100) */}
         {isPreview && viewerName && (
           <Reveal className="pt-1">
-            <div className="flex items-center gap-2 rounded-xl bg-section px-4 py-3">
-              <Eye size={16} aria-hidden className="shrink-0 text-text-weak" />
-              <p className="text-[13px] font-semibold text-text-body">{viewerName}님에게는 이렇게 보여요</p>
+            <div className="flex items-center gap-2 rounded-r4 bg-subtle px-4 py-3">
+              <Eye size={16} aria-hidden className="shrink-0 text-muted" />
+              <p className="text-body-s font-semibold text-default">{viewerName}님에게는 이렇게 보여요</p>
             </div>
           </Reveal>
         )}
 
         {/* 초대 카드 */}
         <Reveal delay={70} className={isPreview ? 'pt-3' : 'pt-1'}>
-          <section className="rounded-card bg-white p-5 shadow-[0_2px_16px_rgba(30,30,30,0.06)] ring-1 ring-border/70">
+          <section className="rounded-r5 bg-page p-5 shadow-s1 ring-1 ring-default/70">
             <div className="flex items-center gap-3">
               <Avatar person={from} size={40} />
-              <p className="min-w-0 text-[13px] font-semibold leading-[1.4] text-primary break-keep">{model.headline}</p>
+              <p className="min-w-0 text-body-s font-semibold leading-snug text-strong break-keep">{model.headline}</p>
             </div>
-            <h1 className="pt-4 text-[22px] font-bold leading-[1.35] tracking-[-0.02em] text-text-strong">
+            <h1 className="pt-4 text-heading font-bold tracking-tight text-strong">
               {model.title}
             </h1>
-            <p className="mt-1 text-[15px] font-medium text-text-body">{model.whenLabel}</p>
+            <p className="mt-1 text-body-l font-medium text-default">{model.whenLabel}</p>
           </section>
         </Reveal>
 
         {/* 왜 이 시간인가요 — 주최자가 챙긴 배려를 수신자도 '본다' */}
         {model.reasons.length > 0 && (
           <Reveal delay={140} className="pt-6">
-            <h2 className="text-[14px] font-semibold text-text-strong">왜 이 시간인가요</h2>
+            <h2 className="text-body font-semibold text-strong">왜 이 시간인가요</h2>
             <div className="mt-2.5">
               <ReasonRows reasons={model.reasons} highlightIndex={model.highlightIndex} animated={!reduced} />
             </div>
@@ -298,50 +298,45 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
                 initial={reduced ? false : { scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={POP_SPRING}
-                className="mx-auto flex h-[52px] w-[52px] items-center justify-center rounded-full bg-primary shadow-[0_8px_24px_rgba(0,0,0,0.21)]"
+                className="mx-auto flex h-[52px] w-[52px] items-center justify-center rounded-full bg-ink shadow-s3"
               >
-                <Check size={28} strokeWidth={3} aria-hidden className="text-white" />
+                <Check size={28} strokeWidth={3} aria-hidden className="text-on-ink" />
               </motion.span>
-              <p className="pt-4 text-[20px] font-bold leading-[1.3] tracking-[-0.01em] text-text-strong">
+              <p className="pt-4 text-title-l font-bold leading-dense tracking-snug text-strong">
                 {fromGiven}님에게 전달했어요
               </p>
-              <p className="mt-1.5 text-[13px] leading-[1.5] text-text-weak">
+              <p className="mt-1.5 text-body-s leading-normal text-muted">
                 {responded === 'accepted'
                   ? '내 캘린더에 일정이 자리 잡았어요'
                   : '어려운 사정도 배려예요 — 사유를 함께 전했어요'}
               </p>
-              <button
-                type="button"
+              <ActionButton size="lg" fullWidth
                 onClick={goHome}
-                className="pressable mt-6 h-[54px] w-full rounded-2xl bg-primary text-[16px] font-semibold text-white active:bg-primary-pressed"
+                className="mt-6"
               >
                 내 캘린더에서 보기
-              </button>
+              </ActionButton>
             </section>
           ) : (
             // 기본 — 참석할게요 / 어려워요 (preview에선 disabled + '미리보기예요')
             <div className="space-y-2" title={isPreview ? '미리보기예요' : undefined}>
-              <button
-                type="button"
+              <ActionButton size="lg" fullWidth
                 disabled={isPreview}
                 onClick={() => respond('accepted')}
-                className="pressable h-[54px] w-full rounded-2xl bg-primary text-[16px] font-semibold text-white transition-colors active:bg-primary-pressed disabled:bg-section disabled:text-text-faint"
               >
                 참석할게요
-              </button>
+              </ActionButton>
               {/* 보조 = 회색 면 — 테두리 버튼은 쓰지 않는다(완료 화면과 같은 계약).
                   사유 입력은 앱의 선택 문법 그대로: PC 팝오버 / 모바일 바텀시트. */}
               <div ref={askRef} className="relative">
-                <button
-                  type="button"
+                <ActionButton variant="weak" size="lg" fullWidth
                   disabled={isPreview}
                   aria-haspopup="dialog"
                   aria-expanded={asking}
                   onClick={() => setAsking((o) => !o)}
-                  className="pressable h-[54px] w-full rounded-2xl bg-section text-[16px] font-semibold text-text-body transition-colors hover:bg-[#F1F1F1] disabled:text-text-faint"
                 >
                   어려워요
-                </button>
+                </ActionButton>
 
                 <AnimatePresence>
                   {asking && desktop && (
@@ -352,11 +347,11 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
                       initial={{ opacity: 0, y: -6, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -4, scale: 0.98 }}
-                      transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 30 }}
+                      transition={reduced ? { duration: 0 } : SPRING.popover}
                       style={{ transformOrigin: 'top' }}
-                      className="absolute inset-x-0 top-[calc(100%+6px)] z-40 rounded-2xl bg-white p-1.5 shadow-[0_12px_40px_rgba(30,30,30,0.14),0_2px_8px_rgba(30,30,30,0.06)] ring-1 ring-border/60"
+                      className="absolute inset-x-0 top-[calc(100%+6px)] z-40 rounded-r5 bg-page p-1.5 shadow-s4 ring-1 ring-default/60"
                     >
-                      <p className="px-3.5 pb-1 pt-2.5 text-[12px] text-text-weak">
+                      <p className="px-3.5 pb-1 pt-2.5 text-label text-muted">
                         {fromGiven}님에게 사유와 함께 전달돼요
                       </p>
                       {DIFFICULT_REASONS.map((label) => (
@@ -364,7 +359,7 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
                           key={label}
                           type="button"
                           onClick={() => respond('difficult')}
-                          className="flex h-11 w-full items-center rounded-xl px-3.5 text-left text-[15px] font-medium text-text-strong transition-colors hover:bg-section"
+                          className="flex h-11 w-full items-center rounded-r4 px-3.5 text-left text-body-l font-medium text-strong transition-colors hover:bg-subtle"
                         >
                           {label}
                         </button>
@@ -378,14 +373,14 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
                   onClose={() => setAsking(false)}
                   title="어떤 사정인지 살짝 알려주시겠어요?"
                 >
-                  <p className="pb-1 text-[13px] text-text-weak">{fromGiven}님에게 사유와 함께 전달돼요</p>
+                  <p className="pb-1 text-body-s text-muted">{fromGiven}님에게 사유와 함께 전달돼요</p>
                   <div className="pb-2">
                     {DIFFICULT_REASONS.map((label, i) => (
                       <SheetCascade key={label} index={i}>
                         <button
                           type="button"
                           onClick={() => respond('difficult')}
-                          className="pressable flex min-h-[52px] w-full items-center py-2 text-left text-[16px] font-medium text-text-strong"
+                          className="pressable flex min-h-[52px] w-full items-center py-2 text-left text-title-s font-medium text-strong"
                         >
                           {label}
                         </button>
@@ -395,7 +390,7 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
                 </MobileSheet>
               </div>
               {isPreview && (
-                <p className="pt-1 text-center text-[12px] text-text-weak">미리보기예요 — 응답은 받은 사람만 할 수 있어요</p>
+                <p className="pt-1 text-center text-label text-muted">미리보기예요 — 응답은 받은 사람만 할 수 있어요</p>
               )}
             </div>
           )}

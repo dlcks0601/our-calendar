@@ -7,6 +7,7 @@ import { buildMonthCells } from '@/shared/lib/calendar-grid';
 import { MobileSheet, SheetCascade } from '@/shared/ui/mobile-sheet';
 import { useIsDesktop } from '@/shared/lib/hooks';
 import { fmtDayKorean } from '@/shared/lib/time';
+import { SPRING } from '@/shared/tokens';
 
 /**
  * 날짜 필드 — PC는 필드 아래 달력 그리드 팝오버(홈 월간 피커 문법),
@@ -74,13 +75,13 @@ export default function DateField({
         aria-expanded={open}
         aria-label={ariaLabel}
         onClick={toggleOpen}
-        className="pressable flex h-[52px] w-full items-center justify-between rounded-2xl bg-section pl-4 pr-4 text-[16px] font-medium text-text-strong lg:text-[15px]"
+        className="pressable flex h-[52px] w-full items-center justify-between rounded-r5 bg-subtle pl-4 pr-4 text-title-s font-medium text-strong lg:text-body-l"
       >
         <span className="truncate">{fmtDayKorean(value)}</span>
         <ChevronDown
           size={16}
           aria-hidden
-          className={`shrink-0 text-text-weak transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`shrink-0 text-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -93,14 +94,14 @@ export default function DateField({
             initial={{ opacity: 0, y: -6, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.98 }}
-            transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 30 }}
+            transition={reduced ? { duration: 0 } : SPRING.popover}
             style={{ transformOrigin: 'top' }}
-            className="absolute inset-x-0 top-[calc(100%+6px)] z-40 rounded-[24px] bg-white p-5 shadow-[0_16px_40px_rgba(30,30,30,0.14),0_2px_8px_rgba(30,30,30,0.06)] ring-1 ring-border/60"
+            className="absolute inset-x-0 top-[calc(100%+6px)] z-40 rounded-r6 bg-page p-5 shadow-s4 ring-1 ring-default/60"
           >
             {/* 팝오버 폭 = 필드 폭 — 시간 피커와 같은 규칙(열린 것이 연 것과 정렬된다). */}
             <div className="grid grid-cols-7 pb-2">
               {WEEKDAY_HEADER.map((d) => (
-                <span key={d} className="py-1 text-center text-[13px] text-text-faint">
+                <span key={d} className="py-1 text-center text-body-s text-faint">
                   {d}
                 </span>
               ))}
@@ -118,19 +119,19 @@ export default function DateField({
                     disabled={!enabled}
                     aria-pressed={isSel}
                     onClick={() => pick(day)}
-                    className={`pressable relative mx-auto flex h-11 w-11 items-center justify-center rounded-[14px] text-[16px] font-semibold ${
+                    className={`pressable relative mx-auto flex h-11 w-11 items-center justify-center rounded-r4 text-title-s font-semibold ${
                       isSel
-                        ? 'bg-primary text-white'
+                        ? 'bg-ink text-on-ink'
                         : enabled
-                          ? 'text-text-strong hover:bg-section'
+                          ? 'text-strong hover:bg-subtle'
                           : inMonth
-                            ? 'text-text-faint'
-                            : 'text-border'
+                            ? 'text-faint'
+                            : 'text-disabled'
                     }`}
                   >
                     {Number(day.slice(8, 10))}
                     {dot && !isSel && (
-                      <span aria-hidden className="absolute bottom-[3px] h-1 w-1 rounded-full bg-primary/60" />
+                      <span aria-hidden className="absolute bottom-[3px] h-1 w-1 rounded-full bg-ink/60" />
                     )}
                   </button>
                 );
@@ -153,12 +154,12 @@ export default function DateField({
                   aria-pressed={isSel}
                   className="pressable flex min-h-[52px] w-full items-center gap-2 py-2 text-left"
                 >
-                  <span className="text-[16px] font-medium text-text-strong">{fmtDayKorean(day)}</span>
+                  <span className="text-title-s font-medium text-strong">{fmtDayKorean(day)}</span>
                   <Check
                     size={22}
                     strokeWidth={3}
                     aria-hidden
-                    className={`ml-auto shrink-0 ${isSel ? 'text-primary' : 'text-[#DADADA]'}`}
+                    className={`ml-auto shrink-0 ${isSel ? 'text-strong' : 'text-disabled'}`}
                   />
                 </button>
               </SheetCascade>

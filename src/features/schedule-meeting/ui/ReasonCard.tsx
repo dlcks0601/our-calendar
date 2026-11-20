@@ -41,9 +41,9 @@ export function summaryLine(slot: Pick<CandidateSlot, 'reasons'>, requiredCount:
 
 /** tone → 칩 클래스 — positive grey100 / tradeoff 파랑 tint / warning warn-bg(테두리 없는 언어). */
 export const REASON_TONE_CLASS: Record<ReasonTone, string> = {
-  positive: 'bg-section text-text-body',
-  tradeoff: 'bg-primary-tint text-primary',
-  warning: 'bg-warn-bg text-warn-fg',
+  positive: 'bg-subtle text-default',
+  tradeoff: 'bg-muted text-strong',
+  warning: 'bg-warning-weak text-warning',
 };
 
 /** 칩 스태거 간격(ms) — 확장 시 이유가 한 줄씩 말하듯 나타난다. */
@@ -62,8 +62,8 @@ export function Reasons({ reasons, animated = true }: { reasons: SlotReason[]; a
           initial={animated ? { opacity: 0, y: 6 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: animated ? (i * REASON_STAGGER_MS) / 1000 : 0, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className={`rounded-[10px] px-3 py-2 text-[13px] leading-[1.45] break-keep ${REASON_TONE_CLASS[r.tone]} ${
-            r.code === 'optional-partial' ? 'font-semibold ring-1 ring-primary/30' : ''
+          className={`rounded-r3 px-3 py-2 text-body-s leading-snug break-keep ${REASON_TONE_CLASS[r.tone]} ${
+            r.code === 'optional-partial' ? 'font-semibold ring-1 ring-ink/30' : ''
           }`}
         >
           {r.text}
