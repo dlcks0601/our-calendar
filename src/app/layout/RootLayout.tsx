@@ -4,14 +4,15 @@ import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import '../styles/globals.css';
 
 /**
- * 라틴 글자와 숫자는 Overused Grotesk, 한글은 Pretendard가 맡는다.
- * 글꼴 목록에서 Overused Grotesk가 앞에 있고 한글 글리프가 없어, 한글만 Pretendard로 넘어간다.
+ * Overused Grotesk는 로고에만 쓴다(`font-logo` 유틸리티, shared/ui/wordmark).
+ * 화면의 글자는 한글·영문·숫자 모두 Pretendard다.
  */
 const overusedGrotesk = localFont({
   src: '../fonts/OverusedGrotesk-VF.ttf',
-  variable: '--font-latin',
+  variable: '--font-wordmark',
   weight: '200 900',
   display: 'swap',
+  adjustFontFallback: false,
 });
 
 export function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
