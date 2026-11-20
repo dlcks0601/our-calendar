@@ -91,7 +91,7 @@ export default function ToastStack({ toasts, onDismiss }: ToastStackProps) {
             onClick={() => onDismiss(toast.id)}
             className="cursor-pointer select-none"
           >
-            <div className="flex items-center gap-2.5 rounded-r4 bg-ink/[.92] px-4 py-3 shadow-s4 backdrop-blur-[6px]">
+            <div className="flex items-center gap-2.5 rounded-r4 bg-ink/[.92] px-4 py-3 shadow-s3 backdrop-blur-[6px]">
               <span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-ink text-on-ink">
                 <Check size={12} strokeWidth={3} />
               </span>

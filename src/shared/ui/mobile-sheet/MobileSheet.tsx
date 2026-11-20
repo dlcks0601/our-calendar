@@ -48,7 +48,7 @@ export default function MobileSheet({
       {open && (
         <>
           <motion.div
-            className="fixed inset-0 z-50 bg-black/40 lg:hidden"
+            className="fixed inset-0 z-50 bg-ink/40 lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

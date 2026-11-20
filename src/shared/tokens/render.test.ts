@@ -33,6 +33,11 @@ describe('renderThemeCss — 명세를 Tailwind 테마 CSS로', () => {
     expect(css).toContain('--shadow-s1: 0 1px 3px rgb(0 0 0 / 0.06);');
   });
 
+  it('Tailwind 기본 색·모서리·그림자·글자 단계를 지운다 — 명세에 있는 값만 클래스가 된다', () => {
+    for (const namespace of ['color', 'radius', 'shadow', 'text', 'leading', 'tracking'])
+      expect(css).toContain(`--${namespace}-*: initial;`);
+  });
+
   it('같은 명세에서는 항상 같은 결과가 나온다', () => {
     expect(renderThemeCss(TOKENS)).toBe(css);
   });

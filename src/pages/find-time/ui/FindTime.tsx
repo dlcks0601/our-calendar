@@ -123,7 +123,7 @@ function WeekStrip({
                 onClick={() => onPick(day)}
                 className={`pressable relative mx-auto flex h-11 w-11 items-center justify-center rounded-r4 text-body-l font-semibold ${
                   selected
-                    ? 'bg-ink text-on-ink shadow-s4'
+                    ? 'bg-ink text-on-ink shadow-s2'
                     : tone === 'ok'
                       ? 'bg-muted font-bold text-strong'
                       : tone === 'warn'
@@ -437,7 +437,7 @@ function OverlapTimeline({
                 backgroundColor: `${item.color}59`,
               }}
             >
-              <span className="pointer-events-none absolute -top-7 left-1 z-20 hidden whitespace-nowrap rounded-r2 bg-gray-900 px-2 py-1 text-caption font-medium text-on-ink shadow-s4 group-hover:block">
+              <span className="pointer-events-none absolute -top-7 left-1 z-20 hidden whitespace-nowrap rounded-r2 bg-gray-900 px-2 py-1 text-caption font-medium text-on-ink shadow-s2 group-hover:block">
                 {item.title}
                 {item.owner ? ` · ${item.owner}` : ''}
               </span>
@@ -456,7 +456,7 @@ function OverlapTimeline({
             transition={reduced ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
             aria-label={`${fmtTime(g.start)} 후보 선택`}
             onClick={() => onPick(g)}
-            className="group/ghost absolute inset-x-0 z-[5] flex flex-col items-start justify-start rounded-r3 border-[1.5px] border-dashed border-sky-500/60 bg-sky-500/[0.08] px-3.5 py-2 text-left transition-all duration-200 hover:z-20 hover:border-transparent hover:bg-ink hover:shadow-s4"
+            className="group/ghost absolute inset-x-0 z-[5] flex flex-col items-start justify-start rounded-r3 border-[1.5px] border-dashed border-sky-500/60 bg-sky-500/[0.08] px-3.5 py-2 text-left transition-all duration-200 hover:z-20 hover:border-transparent hover:bg-ink hover:shadow-s2"
             style={{ top: y(g.start) + 2, height: Math.max(y(g.end) - y(g.start) - 5, 20) }}
           >
             {/* 솔리드 카드와 같은 순서 — 제목 먼저, 시간 아래. */}
@@ -478,7 +478,7 @@ function OverlapTimeline({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={reduced ? { duration: 0 } : { duration: 0.22, ease: 'easeOut' }}
-            className="absolute inset-x-0 z-10 rounded-r3 bg-ink px-3.5 py-2 text-on-ink shadow-s4"
+            className="absolute inset-x-0 z-10 rounded-r3 bg-ink px-3.5 py-2 text-on-ink shadow-s2"
             style={{ top: y(slot.start) + 2, height: Math.max(y(slot.end) - y(slot.start) - 5, 20) }}
           >
             {/* 홈 카드와 같은 순서 — 제목이 먼저, 시간이 아래(단일 문법). */}
@@ -754,7 +754,7 @@ export default function FindTime({ state, dispatch, candidates }: FindTimeProps)
                                 className={`pressable rounded-r4 px-3 py-2 text-body-s font-semibold ${
                                   active?.id === s.id
                                     ? 'bg-ink text-on-ink'
-                                    : 'bg-page text-default shadow-s4 hover:bg-subtle'
+                                    : 'bg-page text-default shadow-s1 hover:bg-subtle'
                                 }`}
                               >
                                 {fmtTime(s.start)}

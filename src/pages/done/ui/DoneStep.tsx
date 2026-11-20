@@ -121,7 +121,7 @@ export default function DoneStep({ state, dispatch }: DoneStepProps) {
           initial={reduced ? false : { scale: 0 }}
           animate={{ scale: 1 }}
           transition={POP_SPRING}
-          className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-ink shadow-s4"
+          className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-ink shadow-s3"
         >
           <Check size={28} strokeWidth={3} aria-hidden className="text-on-ink" />
         </motion.div>
@@ -142,7 +142,7 @@ export default function DoneStep({ state, dispatch }: DoneStepProps) {
         {/* 함께 챙긴 것 — 파생 항목이 없으면 카드도 없다 */}
         {items.length > 0 && (
           <Reveal delay={260} className="w-full pt-7">
-            <section className="rounded-r5 bg-page p-5 shadow-s4 ring-1 ring-default/70">
+            <section className="rounded-r5 bg-page p-5 shadow-s1 ring-1 ring-default/70">
               <h2 className="text-body-l font-bold tracking-snug text-strong">함께 챙긴 것</h2>
               <ul className="mt-3 space-y-2">
                 {items.map((text, i) => (

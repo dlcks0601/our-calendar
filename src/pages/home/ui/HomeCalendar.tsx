@@ -30,7 +30,7 @@ const GHOST_CARD =
   'group isolate border-2 border-dashed border-sky-200 bg-transparent ' +
   'transition-[background-color,border-color] duration-200 hover:z-10 hover:border-transparent hover:bg-ink ' +
   'after:pointer-events-none after:absolute after:-inset-px after:-z-10 after:rounded-[inherit] ' +
-  'after:shadow-s4 after:opacity-0 after:transition-opacity after:duration-200 hover:after:opacity-100';
+  'after:shadow-s3 after:opacity-0 after:transition-opacity after:duration-200 hover:after:opacity-100';
 const GHOST_TITLE_CLS = 'text-sky-800 transition-colors duration-200 group-hover:text-on-ink';
 const GHOST_SUB_CLS = 'text-sky-600 transition-colors duration-200 group-hover:text-on-ink/80';
 

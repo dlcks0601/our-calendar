@@ -14,6 +14,10 @@ export function renderThemeCss(spec: TokenSpec): string {
   const section = (title: string) => lines.push('', `  /* ${title} */`);
   const put = (name: string, value: string | number) => lines.push(`  --${name}: ${value};`);
 
+  // Tailwind 기본값을 지운다. 명세에 없는 `text-sm`, `rounded-lg`, `bg-white` 같은 클래스는 아무 스타일도 내지 않는다.
+  section('기본값 지우기');
+  for (const namespace of ['color', 'radius', 'shadow', 'text', 'leading', 'tracking']) put(`${namespace}-*`, 'initial');
+
   section('팔레트');
   for (const [family, steps] of Object.entries(spec.palette))
     for (const [step, value] of Object.entries(steps)) put(`color-${family}-${step}`, value);

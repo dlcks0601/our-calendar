@@ -267,7 +267,7 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
 
         {/* 초대 카드 */}
         <Reveal delay={70} className={isPreview ? 'pt-3' : 'pt-1'}>
-          <section className="rounded-r5 bg-page p-5 shadow-s4 ring-1 ring-default/70">
+          <section className="rounded-r5 bg-page p-5 shadow-s1 ring-1 ring-default/70">
             <div className="flex items-center gap-3">
               <Avatar person={from} size={40} />
               <p className="min-w-0 text-body-s font-semibold leading-snug text-strong break-keep">{model.headline}</p>
@@ -298,7 +298,7 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
                 initial={reduced ? false : { scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={POP_SPRING}
-                className="mx-auto flex h-[52px] w-[52px] items-center justify-center rounded-full bg-ink shadow-s4"
+                className="mx-auto flex h-[52px] w-[52px] items-center justify-center rounded-full bg-ink shadow-s3"
               >
                 <Check size={28} strokeWidth={3} aria-hidden className="text-on-ink" />
               </motion.span>

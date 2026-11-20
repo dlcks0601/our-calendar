@@ -5,25 +5,6 @@
    토큰 값은 여기 적지 않는다. 명세(src/shared/tokens/spec)에서 생성한 테마를 가져온다. */
 @import '../../shared/tokens/__generated__/theme.css';
 
-/* 임시 별칭 — 화면이 아직 옛 클래스 이름을 쓴다. 화면을 새 토큰으로 옮긴 뒤 지운다. */
-@theme {
-  --color-primary: #000000;
-  --color-primary-pressed: #2e2e2e;
-  --color-primary-tint: #e6e6e6;
-  --color-bg: #ffffff;
-  --color-section: #f4f4f4;
-  --color-border: #e6e6e6;
-  --color-text-strong: #000000;
-  --color-text-body: #4a4a4a;
-  --color-text-weak: #8c8c8c;
-  --color-text-faint: #b8b8b8;
-  --color-error: #e5342b;
-  --color-warn-fg: #8a6410;
-  --color-warn-bg: #fcf1d6;
-  --color-alert: #f03e3e;
-  --radius-card: 16px;
-}
-
 body {
   font-family: var(--font-sans);
   font-weight: var(--font-weight-normal);
