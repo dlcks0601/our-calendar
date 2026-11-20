@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type Dispatch, type ReactNode } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ChevronLeft, Plus, X } from 'lucide-react';
+import { ChevronLeft, ChevronsUpDown, Plus, X } from 'lucide-react';
 import AttendeePicker from './AttendeePicker';
 import { Aurora } from '@/shared/ui/aurora';
 import { Avatar, ME_ID, ORG, type Person } from '@/entities/member';
@@ -240,19 +240,21 @@ function AttendeeRow({
           {isMe && <span className="ml-1.5 text-[12px] font-normal text-text-weak">나 · 주최자</span>}
         </span>
         {!isMe && (
-          /* 꼭참석/선택 토글 필 — 단일 필 유지(미감 우선 결정). 탭하면 상태가 뒤집힌다. */
+          /* 꼭참석/선택 토글 필 — 탭하면 상태가 뒤집힌다. 회의 길이·기한 칩과 같은 모양(선택 = 검정 면)에
+             위아래 화살표를 더해 누를 수 있는 영역임을 알린다(터치 기기에서는 화살표가 그 역할을 한다). */
           <button
             type="button"
             aria-pressed={required}
             aria-label={`${person.name} ${required ? '꼭 참석' : '선택 참석'}`}
             onClick={onPin}
-            className={`pressable h-7 shrink-0 rounded-full px-2.5 text-[12px] font-semibold transition-colors ${
+            className={`pressable group/pin inline-flex h-7 shrink-0 items-center gap-1 rounded-full pl-2.5 pr-1.5 text-[12px] transition-colors ${
               required
-                ? 'bg-primary-tint text-primary hover:bg-[#E7E7E7]'
-                : 'bg-section text-text-weak hover:bg-[#E8E8E8] hover:text-text-strong'
+                ? 'bg-primary font-semibold text-white hover:bg-primary-pressed'
+                : 'bg-section font-medium text-text-body hover:bg-border/70'
             }`}
           >
             {required ? '꼭 참석' : '선택'}
+            <ChevronsUpDown size={12} aria-hidden className="opacity-45 transition-opacity group-hover/pin:opacity-100" />
           </button>
         )}
         {!isMe && (

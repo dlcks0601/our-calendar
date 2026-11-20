@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 
-/* our calendar — 검정과 흰색만 쓴다. 강조는 색이 아니라 잉크의 농도로 한다.
+/* our calendar — 바탕은 검정과 흰색이다. 버튼·선택·글자는 무채색으로 두고,
+   색은 정보를 구분할 때만 쓴다(일정 종류, 사람, 경고, 새 알림). 파란 계열은 쓰지 않는다.
    글자는 가볍게 두고(굵기 300~560), 무게는 순수한 검정 면이 진다. */
 @theme {
   --color-primary: #000000;
@@ -13,10 +14,10 @@
   --color-text-body: #4a4a4a;
   --color-text-weak: #8c8c8c;
   --color-text-faint: #b8b8b8;
-  --color-error: #000000;
-  --color-warn-fg: #000000;
-  --color-warn-bg: #ececec;
-  /* 유일한 색 — 새 알림이 도착했다는 신호에만 쓴다. */
+  --color-error: #e5342b;
+  --color-warn-fg: #9a5b00;
+  --color-warn-bg: #fff4dc;
+  /* 새 알림이 도착했다는 신호. */
   --color-alert: #f03e3e;
   --radius-card: 16px;
 
@@ -44,6 +45,12 @@ body {
   font-family: var(--font-sans);
   font-weight: var(--font-weight-normal);
   font-feature-settings: 'tnum' 1;
+}
+
+/* 누를 수 있는 것은 손 모양 커서 — Tailwind 4 기본값은 버튼도 화살표다. */
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']) {
+  cursor: pointer;
 }
 
 /* 프레스 스쿼시 — 전 버튼·칩 공용 */
@@ -100,12 +107,12 @@ body {
   to { filter: blur(0); transform: translateY(0); }
 }
 
-/* ── 잉크 광택 — 완료 화면 타이틀 1곳만. clip-text + sheen.
-   DOM 텍스트 유지(접근성) — 검정 위로 옅은 빛이 한 번씩 지나간다. ── */
+/* ── 완료 화면 타이틀 1곳만. clip-text + sheen.
+   DOM 텍스트 유지(접근성) — 보라에서 로즈로 흐른다. 명도는 두 단계 안에서만 논다. ── */
 .iridescent {
   background-image: linear-gradient(
     100deg,
-    #000000 0%, #000000 30%, #5c5c5c 42%, #000000 54%, #000000 100%
+    #6b2fd0 0%, #a23bb5 26%, #c93458 38%, #a23bb5 50%, #6b2fd0 64%, #a23bb5 82%, #6b2fd0 100%
   );
   background-size: 250% 100%;
   background-clip: text;
@@ -118,7 +125,7 @@ body {
   to { background-position: -250% 50%; }
 }
 
-/* ── 스캔 모먼트 — 라이트 무대. 회색 블롭 표류(수렴 없음) + 활성 도트 헤일로 숨쉬기 +
+/* ── 스캔 모먼트 — 라이트 무대. 파스텔 블롭 표류(수렴 없음) + 활성 도트 헤일로 숨쉬기 +
    타이틀 시머(왼→오, 저대비 밴드) + 레일 필 차오름. 재생 게이트는 find 화면이 소유. ── */
 .scan-blob-a { animation: scan-drift-a 8s ease-in-out infinite alternate; }
 .scan-blob-b { animation: scan-drift-b 10s ease-in-out infinite alternate; }
@@ -138,9 +145,9 @@ body {
   to { transform: scale(1.1); opacity: 1; }
 }
 
-/* 시머 — 검정 글자 위로 회색 밴드가 지나간다. 명도 차는 두 단계로 억제. */
+/* 시머 — 검정 글자 위로 보라 밴드가 지나간다. 명도 차는 두 단계로 억제. */
 .scan-title-sheen {
-  background-image: linear-gradient(90deg, #000000 25%, #3d3d3d 42%, #6e6e6e 50%, #3d3d3d 58%, #000000 75%);
+  background-image: linear-gradient(90deg, #1a1a1a 25%, #4b2aa8 42%, #7a3fe0 50%, #4b2aa8 58%, #1a1a1a 75%);
   background-size: 250% 100%;
   background-clip: text;
   -webkit-background-clip: text;

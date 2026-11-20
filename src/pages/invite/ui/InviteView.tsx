@@ -303,7 +303,7 @@ export default function InviteView({ mode, state, dispatch, onRespond }: InviteV
                 initial={reduced ? false : { scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={POP_SPRING}
-                className="mx-auto flex h-[52px] w-[52px] items-center justify-center rounded-full bg-primary shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+                className="mx-auto flex h-[52px] w-[52px] items-center justify-center rounded-full bg-primary shadow-[0_8px_24px_rgba(0,0,0,0.21)]"
               >
                 <Check size={28} strokeWidth={3} aria-hidden className="text-white" />
               </motion.span>

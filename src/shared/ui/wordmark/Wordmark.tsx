@@ -1,19 +1,31 @@
 /**
- * 로고 락업 — 심벌 + `our`(진하게) `calendar`(옅게).
- * 심벌은 검은 타일 위에 겹친 두 원: 나의 시간과 너의 시간이 겹치는 곳이 우리의 시간이다.
+ * 로고 — 글자 없이 심벌만 쓴다.
+ * 꽉 찬 원 하나와 점으로 그린 원 하나. 점 원은 시계처럼 열두 자리를 돌되
+ * 3시 방향 한 자리만 비운다. 점 사이가 붙어 보이지 않게 점은 작게, 심벌은 크게 둔다.
  */
 export default function Wordmark() {
   return (
-    <span className="flex items-center gap-[7px]">
-      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden className="shrink-0">
-        <rect width="24" height="24" rx="6" fill="#000" />
-        <circle cx="9.6" cy="12" r="4.4" fill="none" stroke="#fff" strokeWidth="1.5" />
-        <circle cx="14.4" cy="12" r="4.4" fill="none" stroke="#fff" strokeWidth="1.5" />
-      </svg>
-      <span className="text-[19px] leading-none tracking-[-0.02em]">
-        <span className="font-semibold text-text-strong">our</span>
-        <span className="ml-[5px] font-normal text-text-strong/55">calendar</span>
-      </span>
-    </span>
+    <svg
+      width="55"
+      height="26"
+      viewBox="0 0 34 16"
+      role="img"
+      aria-label="our calendar"
+      className="shrink-0 text-text-strong"
+      fill="currentColor"
+    >
+      <circle cx="8" cy="8" r="7.25" />
+      <circle cx="30.46" cy="11.15" r="0.95" />
+      <circle cx="28.15" cy="13.46" r="0.95" />
+      <circle cx="25.0" cy="14.3" r="0.95" />
+      <circle cx="21.85" cy="13.46" r="0.95" />
+      <circle cx="19.54" cy="11.15" r="0.95" />
+      <circle cx="18.7" cy="8.0" r="0.95" />
+      <circle cx="19.54" cy="4.85" r="0.95" />
+      <circle cx="21.85" cy="2.54" r="0.95" />
+      <circle cx="25.0" cy="1.7" r="0.95" />
+      <circle cx="28.15" cy="2.54" r="0.95" />
+      <circle cx="30.46" cy="4.85" r="0.95" />
+    </svg>
   );
 }
