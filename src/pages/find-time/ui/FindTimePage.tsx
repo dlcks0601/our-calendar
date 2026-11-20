@@ -30,7 +30,7 @@ export default function FindTimePage({ state, dispatch }: { state: AppState; dis
   const scanning = !state.scanPlayed && !reduced;
 
   return (
-    <main className="min-h-dvh bg-bg">
+    <main className="min-h-dvh bg-page">
       {scanning ? (
         /* 라이트 풀블리드 무대 — ScanMoment가 뷰포트 전체를 소유한다(모바일·PC 동일 문법). */
         <ScanMoment
