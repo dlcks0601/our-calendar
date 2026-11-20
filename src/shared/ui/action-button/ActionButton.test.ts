@@ -25,9 +25,23 @@ describe('actionButton — 버튼 변형 조합표', () => {
   });
 
   it('크기마다 높이, 글자 단계, 모서리가 정해져 있다', () => {
-    expect(actionButton({ size: 'xs' })).toMatch(/h-7 .*rounded-full .*text-label/);
-    expect(actionButton({ size: 'sm' })).toMatch(/h-9 .*rounded-r3 .*text-body/);
-    expect(actionButton({ size: 'md' })).toMatch(/h-11 .*rounded-r4 .*text-body-l/);
+    const expectAll = (cls: string, parts: string[]) => parts.forEach((part) => expect(cls.split(' ')).toContain(part));
+    expectAll(actionButton({ size: 'xs' }), ['h-7', 'rounded-full', 'text-label']);
+    expectAll(actionButton({ size: 'sm' }), ['h-9', 'rounded-r3', 'text-body']);
+    expectAll(actionButton({ size: 'md' }), ['h-11', 'rounded-r4', 'text-body-l']);
+  });
+
+  it('pill이면 크기와 상관없이 양끝이 둥글고, 크기별 모서리 클래스는 함께 붙지 않는다', () => {
+    const cls = actionButton({ size: 'md', pill: true }).split(' ');
+    expect(cls).toContain('rounded-full');
+    expect(cls).not.toContain('rounded-r4');
+    expect(actionButton({ size: 'lg', pill: true }).split(' ')).not.toContain('rounded-r5');
+  });
+
+  it('같은 속성을 정하는 클래스가 두 개 붙지 않는다 (모서리)', () => {
+    for (const size of ['xs', 'sm', 'md', 'lg'] as const)
+      for (const pill of [true, false])
+        expect(actionButton({ size, pill }).split(' ').filter((c) => c.startsWith('rounded-'))).toHaveLength(1);
   });
 
   it('fullWidth면 가로를 채운다', () => {

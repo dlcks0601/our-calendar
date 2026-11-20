@@ -1,17 +1,20 @@
-/** 글자 명세 — 크기와 줄 높이를 한 단계로 묶는다. 클래스는 `text-<이름>`. */
+/**
+ * 글자 명세 — 크기와 줄 높이를 한 단계로 묶는다. 클래스는 `text-<이름>`.
+ * 20px까지는 줄 높이 1.5, 그 위 제목은 좁힌다. 따로 정해야 하면 `leading-<이름>`을 함께 쓴다.
+ */
 export const TEXT = {
   micro: { size: 7, lineHeight: 1 },
-  'caption-s': { size: 10, lineHeight: 1.4 },
-  caption: { size: 11, lineHeight: 1.4 },
-  label: { size: 12, lineHeight: 1.4 },
+  'caption-s': { size: 10, lineHeight: 1.5 },
+  caption: { size: 11, lineHeight: 1.5 },
+  label: { size: 12, lineHeight: 1.5 },
   'body-s': { size: 13, lineHeight: 1.5 },
   body: { size: 14, lineHeight: 1.5 },
   'body-l': { size: 15, lineHeight: 1.5 },
-  'title-s': { size: 16, lineHeight: 1.4 },
-  title: { size: 18, lineHeight: 1.35 },
-  'title-l': { size: 20, lineHeight: 1.35 },
-  heading: { size: 22, lineHeight: 1.3 },
-  'heading-l': { size: 24, lineHeight: 1.3 },
+  'title-s': { size: 16, lineHeight: 1.5 },
+  title: { size: 18, lineHeight: 1.5 },
+  'title-l': { size: 20, lineHeight: 1.5 },
+  heading: { size: 22, lineHeight: 1.35 },
+  'heading-l': { size: 24, lineHeight: 1.35 },
   display: { size: 28, lineHeight: 1.3 },
 } as const;
 

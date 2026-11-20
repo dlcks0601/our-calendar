@@ -1,5 +1,5 @@
 /* 생성물 — 직접 고치지 않는다. 명세(src/shared/tokens/spec)를 고친 뒤 `npm run tokens:generate`. */
-@theme {
+@theme static {
   /* 팔레트 */
   --color-gray-0: #FFFFFF;
   --color-gray-50: #F7F7F7;
@@ -94,11 +94,11 @@
   --text-micro: 7px;
   --text-micro--line-height: 1;
   --text-caption-s: 10px;
-  --text-caption-s--line-height: 1.4;
+  --text-caption-s--line-height: 1.5;
   --text-caption: 11px;
-  --text-caption--line-height: 1.4;
+  --text-caption--line-height: 1.5;
   --text-label: 12px;
-  --text-label--line-height: 1.4;
+  --text-label--line-height: 1.5;
   --text-body-s: 13px;
   --text-body-s--line-height: 1.5;
   --text-body: 14px;
@@ -106,15 +106,15 @@
   --text-body-l: 15px;
   --text-body-l--line-height: 1.5;
   --text-title-s: 16px;
-  --text-title-s--line-height: 1.4;
+  --text-title-s--line-height: 1.5;
   --text-title: 18px;
-  --text-title--line-height: 1.35;
+  --text-title--line-height: 1.5;
   --text-title-l: 20px;
-  --text-title-l--line-height: 1.35;
+  --text-title-l--line-height: 1.5;
   --text-heading: 22px;
-  --text-heading--line-height: 1.3;
+  --text-heading--line-height: 1.35;
   --text-heading-l: 24px;
-  --text-heading-l--line-height: 1.3;
+  --text-heading-l--line-height: 1.35;
   --text-display: 28px;
   --text-display--line-height: 1.3;
 

@@ -7,7 +7,7 @@ describe('renderThemeCss — 명세를 Tailwind 테마 CSS로', () => {
 
   it('@theme 블록 하나로 시작한다', () => {
     expect(css.startsWith('/* 생성물')).toBe(true);
-    expect(css.match(/@theme \{/g)).toHaveLength(1);
+    expect(css.match(/@theme static \{/g)).toHaveLength(1);
   });
 
   it('역할 색을 유틸리티별 이름공간으로 낸다', () => {

@@ -6,6 +6,8 @@ export interface ActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElemen
   variant?: ActionButtonVariant;
   size?: ActionButtonSize;
   fullWidth?: boolean;
+  /** 양끝을 둥글게 */
+  pill?: boolean;
 }
 
 /** 글자가 있는 버튼. 아이콘만 있는 버튼은 IconButton을 쓴다. */
@@ -13,9 +15,10 @@ export default function ActionButton({
   variant,
   size,
   fullWidth,
+  pill,
   className,
   type = 'button',
   ...rest
 }: ActionButtonProps) {
-  return <button type={type} className={actionButton({ variant, size, fullWidth, className })} {...rest} />;
+  return <button type={type} className={actionButton({ variant, size, fullWidth, pill, className })} {...rest} />;
 }

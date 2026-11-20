@@ -17,14 +17,26 @@ export const actionButton = recipe({
       ghost: 'text-strong hover:bg-subtle',
     },
     size: {
-      xs: 'h-7 rounded-full px-2.5 text-label',
-      sm: 'h-9 rounded-r3 px-3 text-body',
-      md: 'h-11 rounded-r4 px-4 text-body-l',
-      lg: 'h-13.5 rounded-r5 px-5 text-title-s',
+      xs: 'h-7 px-2.5 text-label',
+      sm: 'h-9 px-3 text-body',
+      md: 'h-11 px-4 text-body-l',
+      lg: 'h-13.5 px-5 text-title-s',
     },
     fullWidth: { true: 'w-full', false: '' },
+    /** 양끝을 둥글게. 가장 작은 xs는 항상 둥글다. */
+    pill: { true: '', false: '' },
   },
-  defaultVariants: { variant: 'solid', size: 'md', fullWidth: false },
+  // 모서리는 크기와 pill이 함께 정한다 — 같은 속성의 클래스가 둘 붙지 않도록 조합으로만 준다.
+  compoundVariants: [
+    { size: 'xs', class: 'rounded-full' },
+    { size: 'sm', pill: false, class: 'rounded-r3' },
+    { size: 'md', pill: false, class: 'rounded-r4' },
+    { size: 'lg', pill: false, class: 'rounded-r5' },
+    { size: 'sm', pill: true, class: 'rounded-full' },
+    { size: 'md', pill: true, class: 'rounded-full' },
+    { size: 'lg', pill: true, class: 'rounded-full' },
+  ],
+  defaultVariants: { variant: 'solid', size: 'md', fullWidth: false, pill: false },
 });
 
 export type ActionButtonVariant = 'solid' | 'weak' | 'ghost';

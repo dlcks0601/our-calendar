@@ -4,9 +4,9 @@
  */
 export default function Wordmark() {
   return (
-    <span className="font-logo text-[20px] leading-none tracking-[-0.02em]">
-      <span className="font-semibold text-text-strong">our</span>
-      <span className="ml-[5px] font-normal text-text-strong/55">calendar</span>
+    <span className="font-logo text-title-l leading-none tracking-tight">
+      <span className="font-semibold text-strong">our</span>
+      <span className="ml-[5px] font-normal text-strong/55">calendar</span>
     </span>
   );
 }
