@@ -16,6 +16,8 @@
   --color-error: #000000;
   --color-warn-fg: #000000;
   --color-warn-bg: #ececec;
+  /* 유일한 색 — 새 알림이 도착했다는 신호에만 쓴다. */
+  --color-alert: #f03e3e;
   --radius-card: 16px;
 
   --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
